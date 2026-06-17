@@ -1,0 +1,18 @@
+{
+  "storeName": "ARAQ Herbal",
+  "storeTagline": "Pure. Natural. Handcrafted.",
+  "storeEmail": "hello@araqherbal.com",
+  "storePhone": "9960361331",
+  "storeAddress": "MP Bhopal",
+  "currency": "INR",
+  "currencySymbol": "₹",
+  "taxRate": 0,
+  "shippingFee": 5,
+  "freeShippingThreshold": 5,
+  "lowStockThreshold": 1,
+  "logo": "",
+  "favicon": "",
+  "socialInstagram": "https://instagram.com/araqherbal",
+  "socialFacebook": "https://facebook.com/araqherbal",
+  "socialTwitter": "https://twitter.com/araqherbal"
+}

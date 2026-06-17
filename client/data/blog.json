@@ -1,0 +1,28 @@
+[
+  {
+    "id": 1,
+    "title": "The Art of Natural Soap Making",
+    "slug": "art-of-natural-soap-making",
+    "excerpt": "Discover the ancient art of crafting soaps from natural botanical ingredients that have been used for centuries.",
+    "content": "Natural soap making is a time-honoured tradition that stretches back thousands of years. The ancient Egyptians, Babylonians, and Romans all had their own versions of soap, typically made from animal fats and plant ashes.\n\nToday, artisan soap makers use a process called cold-process soap making, which preserves the natural glycerine created during saponification. This glycerine is a natural moisturiser that commercial manufacturers often remove and sell separately.\n\nKey ingredients in natural soaps include coconut oil for lather, olive oil for moisturising, shea butter for creaminess, and essential oils for fragrance and therapeutic benefits. Each ingredient plays a specific role in the final product's properties.",
+    "image": "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?q=80&w=800&auto=format&fit=crop",
+    "author": "Admin",
+    "category": "Education",
+    "tags": ["soap", "natural", "crafting"],
+    "status": "published",
+    "date": "2024-01-15"
+  },
+  {
+    "id": 2,
+    "title": "Benefits of Magnesium for Muscle Recovery",
+    "slug": "benefits-of-magnesium-muscle-recovery",
+    "excerpt": "Learn how magnesium chloride soaks can dramatically improve post-workout recovery and promote deeper sleep.",
+    "content": "Magnesium is an essential mineral involved in over 300 enzymatic reactions in the body. Despite its importance, many people are deficient in this critical nutrient.\n\nTransdermal magnesium absorption through bath soaks has become increasingly popular as a way to quickly replenish magnesium levels. When you soak in magnesium-rich bath salts, the mineral absorbs through your skin directly into the bloodstream.\n\nBenefits include reduced muscle cramps, improved sleep quality, reduced stress and anxiety, better bone health, and improved heart health. Athletes particularly benefit from magnesium soaks after intense training sessions.",
+    "image": "https://images.unsplash.com/photo-1546554137-f86b9593a222?q=80&w=800&auto=format&fit=crop",
+    "author": "Admin",
+    "category": "Wellness",
+    "tags": ["magnesium", "recovery", "wellness"],
+    "status": "published",
+    "date": "2024-02-20"
+  }
+]

@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1001,
+    "customerName": "John Doe",
+    "customerEmail": "john@example.com",
+    "items": [
+      {
+        "id": 1,
+        "name": "Magnesium Muscle Relief Elixir",
+        "price": 18,
+        "quantity": 2
+      },
+      {
+        "id": 5,
+        "name": "Shea Butter Daily Nourishing Bar",
+        "price": 12,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 48,
+    "shipping": 9.99,
+    "tax": 3.84,
+    "total": 61.83,
+    "date": "June 13, 2026",
+    "status": "Delivered"
+  },
+  {
+    "id": 1002,
+    "customerName": "Jane Smith",
+    "customerEmail": "jane@example.com",
+    "items": [
+      {
+        "id": 2,
+        "name": "Kokum Butter Intense Repair Bar",
+        "price": 14.5,
+        "quantity": 4
+      }
+    ],
+    "subtotal": 58,
+    "shipping": 0,
+    "tax": 4.64,
+    "total": 62.64,
+    "date": "June 14, 2026",
+    "status": "Shipped"
+  },
+  {
+    "id": 1003,
+    "customerName": "Crsongirkar2 new",
+    "customerEmail": "crsongirkar2@gmail.com",
+    "items": [
+      {
+        "id": 2,
+        "name": "Lip Balm",
+        "price": 14.5,
+        "quantity": 3
+      }
+    ],
+    "subtotal": 43.5,
+    "shipping": 9.99,
+    "tax": 3.48,
+    "total": 56.97,
+    "date": "June 16, 2026",
+    "status": "Pending"
+  },
+  {
+    "id": 1004,
+    "customerName": "Crsongirkar2 new",
+    "customerEmail": "crsongirkar2@gmail.com",
+    "items": [
+      {
+        "id": 1,
+        "name": "Soap",
+        "price": 18,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 18,
+    "shipping": 9.99,
+    "tax": 1.44,
+    "total": 29.430000000000003,
+    "date": "June 16, 2026",
+    "status": "Pending"
+  },
+  {
+    "id": 1005,
+    "customerName": "Crsongirkar2 new",
+    "customerEmail": "crsongirkar2@gmail.com",
+    "items": [
+      {
+        "id": 2,
+        "name": "Lip Balm",
+        "price": 14.5,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 14.5,
+    "shipping": 9.99,
+    "tax": 1.16,
+    "total": 25.650000000000002,
+    "date": "June 16, 2026",
+    "status": "Pending"
+  },
+  {
+    "id": 1006,
+    "customerName": "chinmay new",
+    "customerEmail": "crsongirkar2@gmail.com",
+    "items": [
+      {
+        "id": 1,
+        "name": "Soap",
+        "price": 18,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 18,
+    "shipping": 9.99,
+    "tax": 1.44,
+    "total": 29.430000000000003,
+    "date": "June 16, 2026",
+    "status": "Pending"
+  }
+]

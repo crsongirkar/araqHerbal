@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "Bodyy",
+    "slug": "body-care",
+    "description": "Nourishing body care products for daily use"
+  },
+  {
+    "id": 2,
+    "name": "Skin Caress",
+    "slug": "skin-care",
+    "description": "Gentle skin care formulas for all skin types"
+  },
+  {
+    "id": 3,
+    "name": "Foot Care",
+    "slug": "foot-care",
+    "description": "Soothing foot treatments and soaks"
+  },
+  {
+    "id": 4,
+    "name": "Hair Care",
+    "slug": "hair-care",
+    "description": "Natural hair care solutions and treatments"
+  },
+  {
+    "id": 5,
+    "name": "Sunscreen",
+    "slug": "sunscreen",
+    "description": ""
+  }
+]

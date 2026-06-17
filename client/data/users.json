@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "name": "Chinmay",
+    "email": "admin@araq.com",
+    "role": "Administrator",
+    "joinDate": "June 10, 2026",
+    "status": "Active"
+  },
+  {
+    "id": 2,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "role": "Customer",
+    "joinDate": "June 11, 2026",
+    "status": "Active"
+  },
+  {
+    "id": 3,
+    "name": "Jane Smith",
+    "email": "jane@example.com",
+    "role": "Customer",
+    "joinDate": "June 12, 2026",
+    "status": "Active"
+  },
+  {
+    "id": 4,
+    "name": "Alice Johnson",
+    "email": "alice@example.com",
+    "role": "Customer",
+    "joinDate": "June 13, 2026",
+    "status": "Active"
+  }
+]

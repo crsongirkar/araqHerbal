@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "name": "Soap",
+    "price": 18,
+    "category": "Body Care",
+    "image": "/uploads/1781455744079-whatsapp_image_2026-03-25_at_09.46.44__1_.jpeg",
+    "description": "Formulated for targeted muscle relaxation. Infused with pure magnesium chloride flakes, epsom salts, and calming wild lavender oils to help dissolve stress and relieve physical tension in the bath or shower.",
+    "stock": 100,
+    "images": [
+      "/uploads/1781685316013-whatsapp_image_2026-03-25_at_09.46.44__1_.jpeg",
+      "/uploads/1781685324575-whatsapp_image_2026-03-25_at_09.46.44_copy.jpeg",
+      "/uploads/1781685327873-whatsapp_image_2026-03-25_at_09.46.44.jpeg"
+    ],
+    "mfgDate": "Oct 2025",
+    "expiryDate": "Oct 2027"
+  },
+  {
+    "id": 2,
+    "name": "Lip Balm",
+    "price": 14.5,
+    "category": "Sunscreen",
+    "image": "/uploads/1781460652387-whatsapp_image_2026-03-25_at_09.45.47.jpeg",
+    "description": "An incredibly rich, non-comedogenic bar made with pure wild-harvested Kokum butter from India. Deeply repairs and protects compromised skin barriers, providing intensive moisture for dry skin.",
+    "stock": 100
+  },
+  {
+    "id": 3,
+    "name": "Tea Tree & Mint Foot Soak",
+    "price": 16,
+    "category": "Foot Care",
+    "image": "/uploads/1781550228803-whatsapp_image_2026-03-25_at_09.46.44_copy.jpeg",
+    "description": "An invigorating herbal remedy for tired feet. Contains natural tea tree oil, crushed peppermint leaves, and Epsom salt to deodorize, provide antifungal protection, and refresh aching muscles.",
+    "stock": 100
+  },
+  {
+    "id": 4,
+    "name": "Aloe Vera & Cucumber Soothing Elixir",
+    "price": 15,
+    "category": "Skin Care",
+    "image": "/uploads/1781550241323-whatsapp_image_2026-03-25_at_09.46.44.jpeg",
+    "description": "Extremely soothing daily cleanser. Packed with raw organic aloe vera leaf gel and fresh cucumber extracts to calm redness, sunburn, and dry patches while delivering deep cooling hydration.",
+    "stock": 100
+  },
+  {
+    "id": 5,
+    "name": "Shea Butter Daily Nourishing Bar",
+    "price": 12,
+    "category": "Body Care",
+    "image": "/uploads/1781550257731-whatsapp_image_2026-03-25_at_09.32.42.jpeg",
+    "description": "Our classic recipe. Formulated with 30% organic unrefined shea butter, extra virgin olive oil, and cold-pressed coconut oil. Lathers into a rich lotion-like foam that leaves skin clean, soft, and supple.",
+    "stock": 100
+  },
+  {
+    "id": 6,
+    "name": "Coconut Oil Natural Hydration Soap",
+    "price": 12.5,
+    "category": "Body Care",
+    "image": "/uploads/1781550275172-whatsapp_image_2026-03-25_at_09.32.41.jpeg",
+    "description": "Simple, pure, and deeply cleansing. Formulated with virgin coconut oil to offer premium lathering and high skin moisturization. Naturally unscented and suitable for all skin types.",
+    "stock": 100
+  },
+  {
+    "id": 8,
+    "name": "French Rose Clay Refining Soap",
+    "price": 15.5,
+    "category": "Skin Care",
+    "image": "/uploads/1781550290781-whatsapp_image_2026-03-25_at_09.45.46.jpeg",
+    "description": "Mild, purifying, and skin-refining. French rose clay gently absorbs excess oils and sweeps away impurities, while cold-pressed rosehip seed oil provides anti-aging antioxidants for a bright glow.",
+    "stock": 100
+  }
+]
