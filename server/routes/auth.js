@@ -27,6 +27,59 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// Reusable helper supporting both Resend API (HTTP, works on Render) and SMTP (blocks ports on Render free tier)
+const sendEmail = async (to, subject, html) => {
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const smtpConfigured = process.env.SMTP_HOST && process.env.SMTP_USER;
+
+  if (resendApiKey) {
+    try {
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${resendApiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          from: process.env.SMTP_FROM || "onboarding@resend.dev",
+          to,
+          subject,
+          html
+        })
+      });
+      if (response.ok) {
+        console.log(`[Resend Email] Email sent successfully to ${to}`);
+        return true;
+      } else {
+        const errText = await response.text();
+        console.error(`[Resend Email] Failed to send to ${to}:`, errText);
+        return false;
+      }
+    } catch (err) {
+      console.error(`[Resend Email] Error sending to ${to}:`, err.message);
+      return false;
+    }
+  } else if (smtpConfigured) {
+    try {
+      const mailOptions = {
+        from: process.env.SMTP_FROM || `"ARAQ Herbal" <hello@araqherbal.com>`,
+        to,
+        subject,
+        html
+      };
+      await transporter.sendMail(mailOptions);
+      console.log(`[SMTP Email] Email sent successfully to ${to}`);
+      return true;
+    } catch (err) {
+      console.error(`[SMTP Email] Failed to send email to ${to}:`, err.message);
+      return false;
+    }
+  } else {
+    console.log(`[Email Skipped] No email provider configured (to: ${to}, subject: ${subject})`);
+    return false;
+  }
+};
+
 // 1. Send OTP Code
 router.post("/auth/send-otp", async (req, res) => {
   const { email } = req.body;
@@ -44,25 +97,8 @@ router.post("/auth/send-otp", async (req, res) => {
     await Otp.create({ email: normalizedEmail, code });
     console.log(`🔑 [OTP Generate] Code is: ${code} for email: ${normalizedEmail}`);
 
-    // Try sending email
-    const smtpConfigured = process.env.SMTP_HOST && process.env.SMTP_USER;
-    if (smtpConfigured) {
-      const mailOptions = {
-        from: process.env.SMTP_FROM || `"ARAQ Herbal" <hello@araqherbal.com>`,
-        to: normalizedEmail,
-        subject: "ARAQ Verification Code",
-        html: getOtpEmailTemplate(code)
-      };
-
-      // Send email in the background without blocking the HTTP response
-      transporter.sendMail(mailOptions)
-        .then(() => {
-          console.log(`[Email] OTP sent successfully to ${normalizedEmail}`);
-        })
-        .catch((err) => {
-          console.error(`[Email] Failed to send OTP email to ${normalizedEmail}:`, err.message);
-        });
-    }
+    // Try sending email asynchronously
+    sendEmail(normalizedEmail, "ARAQ Verification Code", getOtpEmailTemplate(code));
 
     return res.json({ success: true, message: "Verification code sent." });
   } catch (error) {
@@ -123,25 +159,9 @@ router.post("/auth/verify-otp", async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
-    // Send welcome email if new account was created and SMTP is configured
+    // Send welcome email if new account was created
     if (isNewUser) {
-      const smtpConfigured = process.env.SMTP_HOST && process.env.SMTP_USER;
-      if (smtpConfigured) {
-        const mailOptions = {
-          from: process.env.SMTP_FROM || `"ARAQ Herbal" <hello@araqherbal.com>`,
-          to: user.email,
-          subject: "Welcome to the ARAQ Family!",
-          html: getWelcomeEmailTemplate(user.name)
-        };
-
-        transporter.sendMail(mailOptions)
-          .then(() => {
-            console.log(`[Email] Registration welcome email sent successfully to ${user.email}`);
-          })
-          .catch((err) => {
-            console.error(`[Email] Failed to send registration welcome email to ${user.email}:`, err);
-          });
-      }
+      sendEmail(user.email, "Welcome to the ARAQ Family!", getWelcomeEmailTemplate(user.name));
     }
 
     return res.json({ success: true, user });
@@ -431,24 +451,8 @@ router.post("/subscribe", async (req, res) => {
     // Save new subscriber
     await Subscriber.create({ email: normalizedEmail });
 
-    // Send confirmation email if SMTP is configured
-    const smtpConfigured = process.env.SMTP_HOST && process.env.SMTP_USER;
-    if (smtpConfigured) {
-      const mailOptions = {
-        from: process.env.SMTP_FROM || `"ARAQ Herbal" <hello@araqherbal.com>`,
-        to: normalizedEmail,
-        subject: "Welcome to the ARAQ Circle!",
-        html: getSubscriptionEmailTemplate()
-      };
-
-      transporter.sendMail(mailOptions)
-        .then(() => {
-          console.log(`[Email] Subscription welcome email sent successfully to ${normalizedEmail}`);
-        })
-        .catch((err) => {
-          console.error(`[Email] Failed to send subscription welcome email to ${normalizedEmail}:`, err);
-        });
-    }
+    // Send confirmation email
+    sendEmail(normalizedEmail, "Welcome to the ARAQ Circle!", getSubscriptionEmailTemplate());
 
     return res.json({ success: true, message: "Thank you for subscribing!" });
   } catch (error) {
