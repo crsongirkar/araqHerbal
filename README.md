@@ -1,4 +1,4 @@
-# BloomShop - Free Next.js Tailwind CSS E-Commerce Template
+# Araq - Free Next.js Tailwind CSS E-Commerce Template
 
 #### Preview
 
