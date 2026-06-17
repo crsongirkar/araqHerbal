@@ -2,11 +2,6 @@
 
 #### Preview
 
- - [Demo](https://themewagon.github.io/bloomtpl/)
-
-#### Download
- - [Download from ThemeWagon](https://themewagon.com/themes/bloomtpl/)
-
 ## Getting Started
 
 1. Clone Repository
