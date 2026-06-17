@@ -42,6 +42,7 @@ router.post("/auth/send-otp", async (req, res) => {
     // Save to database, replacing previous code for this email if it existed
     await Otp.deleteMany({ email: normalizedEmail });
     await Otp.create({ email: normalizedEmail, code });
+    console.log(`🔑 [OTP Generate] Code is: ${code} for email: ${normalizedEmail}`);
 
     // Try sending email
     const smtpConfigured = process.env.SMTP_HOST && process.env.SMTP_USER;
@@ -53,10 +54,14 @@ router.post("/auth/send-otp", async (req, res) => {
         html: getOtpEmailTemplate(code)
       };
 
-      await transporter.sendMail(mailOptions);
-      console.log(`[Email] OTP sent successfully to ${normalizedEmail}`);
-    } else {
-
+      // Send email in the background without blocking the HTTP response
+      transporter.sendMail(mailOptions)
+        .then(() => {
+          console.log(`[Email] OTP sent successfully to ${normalizedEmail}`);
+        })
+        .catch((err) => {
+          console.error(`[Email] Failed to send OTP email to ${normalizedEmail}:`, err.message);
+        });
     }
 
     return res.json({ success: true, message: "Verification code sent." });
