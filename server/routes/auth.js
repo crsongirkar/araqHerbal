@@ -29,10 +29,42 @@ const transporter = nodemailer.createTransport({
 
 // Reusable helper supporting both Resend API (HTTP, works on Render) and SMTP (blocks ports on Render free tier)
 const sendEmail = async (to, subject, html) => {
+  const brevoApiKey = process.env.BREVO_API_KEY;
   const resendApiKey = process.env.RESEND_API_KEY;
   const smtpConfigured = process.env.SMTP_HOST && process.env.SMTP_USER;
 
-  if (resendApiKey) {
+  if (brevoApiKey) {
+    try {
+      const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+          "accept": "application/json",
+          "api-key": brevoApiKey,
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          sender: { 
+            name: "ARAQ Herbal", 
+            email: process.env.SMTP_USER || "takeuforword@gmail.com" 
+          },
+          to: [{ email: to }],
+          subject,
+          htmlContent: html
+        })
+      });
+      if (response.ok) {
+        console.log(`[Brevo Email] Email sent successfully to ${to}`);
+        return true;
+      } else {
+        const errText = await response.text();
+        console.error(`[Brevo Email] Failed to send to ${to}:`, errText);
+        return false;
+      }
+    } catch (err) {
+      console.error(`[Brevo Email] Error sending to ${to}:`, err.message);
+      return false;
+    }
+  } else if (resendApiKey) {
     try {
       const response = await fetch("https://api.resend.com/emails", {
         method: "POST",
