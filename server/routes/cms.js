@@ -64,7 +64,7 @@ router.put("/products", async (req, res) => {
     const product = await Product.findOne({ id: parseInt(id) });
     if (!product) return res.status(404).json({ error: "Product not found" });
 
-    Object.assign(product, updatedFields);
+    product.set(updatedFields);
     if (updatedFields.price !== undefined) product.price = parseFloat(updatedFields.price);
     if (updatedFields.originalPrice !== undefined) {
       product.originalPrice = updatedFields.originalPrice ? parseFloat(updatedFields.originalPrice) : undefined;
@@ -74,6 +74,7 @@ router.put("/products", async (req, res) => {
     await product.save();
     return res.json(product);
   } catch (error) {
+    console.error("Error updating product:", error);
     return res.status(500).json({ error: "Failed to update product" });
   }
 });
