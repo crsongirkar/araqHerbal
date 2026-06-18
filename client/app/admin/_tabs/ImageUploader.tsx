@@ -22,16 +22,21 @@ export default function ImageUploader({ value, onChange, label = "Image" }: Imag
     setError("");
     setUploading(true);
     try {
-      const form = new FormData();
-      form.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: form });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
-      onChange(data.url);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64Url = reader.result as string;
+        onChange(base64Url);
+        setUploading(false);
+      };
+      reader.onerror = () => {
+        setError("Failed to read file");
+        setUploading(false);
+      };
+      reader.readAsDataURL(file);
     } catch (err: any) {
       setError(err.message || "Upload failed");
-    } finally {
       setUploading(false);
+    } finally {
       if (inputRef.current) inputRef.current.value = "";
     }
   };

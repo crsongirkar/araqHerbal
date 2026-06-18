@@ -23,7 +23,7 @@ export default function ProductsTab({ categories, showToast }: Props) {
   const [form, setForm] = useState({
     name: "", price: "", originalPrice: "", category: "Body Care",
     image: "", images: [] as string[], description: "", stock: "100",
-    mfgDate: "", expiryDate: ""
+    mfgDate: "", expiryDate: "", ingredients: "", netWeight: "", shelfLife: ""
   });
 
   const catOptions = ["All", ...categories.map(c => c.name)];
@@ -40,7 +40,7 @@ export default function ProductsTab({ categories, showToast }: Props) {
     setForm({
       name: "", price: "", originalPrice: "", category: "Body Care",
       image: "", images: [], description: "", stock: "100",
-      mfgDate: "", expiryDate: ""
+      mfgDate: "", expiryDate: "", ingredients: "", netWeight: "", shelfLife: ""
     });
   };
 
@@ -51,7 +51,10 @@ export default function ProductsTab({ categories, showToast }: Props) {
       category: p.category, image: p.image, images: p.images || [], description: p.description,
       stock: (p as any).stock?.toString() ?? "100",
       mfgDate: p.mfgDate || "",
-      expiryDate: p.expiryDate || ""
+      expiryDate: p.expiryDate || "",
+      ingredients: p.ingredients || "",
+      netWeight: (p as any).netWeight || "",
+      shelfLife: (p as any).shelfLife || ""
     });
     setView("form");
   };
@@ -76,7 +79,10 @@ export default function ProductsTab({ categories, showToast }: Props) {
       category: form.category, image: form.image, images: form.images, description: form.description,
       stock: parseInt(form.stock) || 100,
       mfgDate: form.mfgDate || undefined,
-      expiryDate: form.expiryDate || undefined
+      expiryDate: form.expiryDate || undefined,
+      ingredients: form.ingredients || undefined,
+      netWeight: form.netWeight || undefined,
+      shelfLife: form.shelfLife || undefined
     };
     const result = editingId !== null ? await updateProduct(editingId, payload) : await addProduct(payload);
     setSubmitting(false);
@@ -169,11 +175,24 @@ export default function ProductsTab({ categories, showToast }: Props) {
               <label className="text-[10px] font-bold text-[#1e2521] tracking-widest uppercase block mb-1.5">Expiry Date</label>
               <input type="text" placeholder="e.g. Oct 2027" value={form.expiryDate} onChange={e => setForm(f => ({ ...f, expiryDate: e.target.value }))} className="w-full rounded-xl border border-[#e0e7e2] px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d6a4f]" />
             </div>
+            <div>
+              <label className="text-[10px] font-bold text-[#1e2521] tracking-widest uppercase block mb-1.5">Net Weight</label>
+              <input type="text" placeholder="e.g. 100g / 250ml" value={form.netWeight} onChange={e => setForm(f => ({ ...f, netWeight: e.target.value }))} className="w-full rounded-xl border border-[#e0e7e2] px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d6a4f]" />
+            </div>
+            <div>
+              <label className="text-[10px] font-bold text-[#1e2521] tracking-widest uppercase block mb-1.5">Shelf Life</label>
+              <input type="text" placeholder="e.g. 24 Months" value={form.shelfLife} onChange={e => setForm(f => ({ ...f, shelfLife: e.target.value }))} className="w-full rounded-xl border border-[#e0e7e2] px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d6a4f]" />
+            </div>
           </div>
 
           <div>
             <label className="text-[10px] font-bold text-[#1e2521] tracking-widest uppercase block mb-1.5">Description *</label>
             <textarea rows={4} placeholder="Describe ingredients, benefits, and skin applications..." value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} className="w-full rounded-xl border border-[#e0e7e2] px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d6a4f] resize-none" />
+          </div>
+
+          <div>
+            <label className="text-[10px] font-bold text-[#1e2521] tracking-widest uppercase block mb-1.5">Ingredients</label>
+            <textarea rows={3} placeholder="e.g. Organic Coconut Oil, Shea Butter, Essential Oils..." value={form.ingredients} onChange={e => setForm(f => ({ ...f, ingredients: e.target.value }))} className="w-full rounded-xl border border-[#e0e7e2] px-4 py-2.5 text-sm focus:outline-none focus:border-[#2d6a4f] resize-none" />
           </div>
 
           <div className="flex gap-3 pt-1">

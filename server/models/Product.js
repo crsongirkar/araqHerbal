@@ -13,7 +13,10 @@ const ProductSchema = new mongoose.Schema({
   rating: { type: Number, default: 4.5 },
   reviewCount: { type: Number, default: 20 },
   mfgDate: { type: String },
-  expiryDate: { type: String }
+  expiryDate: { type: String },
+  ingredients: { type: String },
+  netWeight: { type: String },
+  shelfLife: { type: String }
 });
 
 // Auto-increment ID hook

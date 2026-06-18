@@ -46,7 +46,10 @@ router.post("/products", async (req, res) => {
       rating: body.rating ? parseFloat(body.rating) : 4.5,
       reviewCount: body.reviewCount ? parseInt(body.reviewCount) : Math.floor(Math.random() * 80) + 20,
       mfgDate: body.mfgDate,
-      expiryDate: body.expiryDate
+      expiryDate: body.expiryDate,
+      ingredients: body.ingredients,
+      netWeight: body.netWeight,
+      shelfLife: body.shelfLife
     });
 
     await newProduct.save();

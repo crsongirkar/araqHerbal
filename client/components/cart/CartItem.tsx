@@ -36,6 +36,7 @@ export default function CartItem({ item, isLast }: CartItemProps) {
             alt={item.name}
             fill
             sizes="100px"
+            unoptimized={item.image?.startsWith("data:")}
             className="rounded-lg object-cover bg-muted"
           />
         </div>

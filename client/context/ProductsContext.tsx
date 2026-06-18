@@ -17,6 +17,9 @@ export interface Product {
   stock?: number;
   mfgDate?: string;
   expiryDate?: string;
+  ingredients?: string;
+  netWeight?: string;
+  shelfLife?: string;
 }
 
 interface ProductsContextProps {

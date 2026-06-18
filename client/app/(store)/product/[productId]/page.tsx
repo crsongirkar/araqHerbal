@@ -32,6 +32,7 @@ export default function Product() {
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
+  const [isIngredientsOpen, setIsIngredientsOpen] = useState(false);
   const { toggleWishlist, isInWishlist } = useWishlist();
 
   useEffect(() => {
@@ -116,6 +117,7 @@ export default function Product() {
                           src={imgUrl}
                           alt={`${product.name} gallery ${index}`}
                           fill
+                          unoptimized={imgUrl?.startsWith("data:")}
                           sizes="64px"
                           className="object-contain p-1"
                         />
@@ -131,6 +133,7 @@ export default function Product() {
                     alt={product.name}
                     fill
                     priority
+                    unoptimized={allImages[activeImageIdx]?.startsWith("data:")}
                     sizes="(max-width: 768px) 100vw, 500px"
                     className="object-contain p-4 rounded-2xl mix-blend-multiply"
                   />
@@ -192,8 +195,26 @@ export default function Product() {
             {product.description}
           </p>
 
-          {/* Mfg and Expiry Details */}
-          {(product.mfgDate || product.expiryDate) && (
+          {product.ingredients && (
+            <div className="border border-[#e0e7e2] rounded-2xl overflow-hidden shadow-sm bg-white transition-all">
+              <button
+                type="button"
+                onClick={() => setIsIngredientsOpen(!isIngredientsOpen)}
+                className="w-full flex items-center justify-between p-4 text-left font-serif text-sm font-semibold text-[#1e2521] hover:bg-stone-50 cursor-pointer"
+              >
+                <span>Ingredients</span>
+                <span className="text-[#2d6a4f] font-mono text-base">{isIngredientsOpen ? "−" : "+"}</span>
+              </button>
+              {isIngredientsOpen && (
+                <div className="px-4 pb-4 text-xs text-[#5c6b62] border-t border-[#e0e7e2]/60 pt-3 leading-relaxed whitespace-pre-line">
+                  {product.ingredients}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Product Specifications */}
+          {(product.mfgDate || product.expiryDate || (product as any).netWeight || (product as any).shelfLife) && (
             <div className="bg-[#fcfcfb] border border-[#e0e7e2] rounded-2xl p-4 grid grid-cols-2 gap-4 text-xs shadow-sm">
               {product.mfgDate && (
                 <div className="space-y-0.5">
@@ -205,6 +226,18 @@ export default function Product() {
                 <div className="space-y-0.5">
                   <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Expiry Date</span>
                   <span className="font-semibold text-stone-800">{product.expiryDate}</span>
+                </div>
+              )}
+              {(product as any).netWeight && (
+                <div className="space-y-0.5">
+                  <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Net Weight</span>
+                  <span className="font-semibold text-stone-800">{(product as any).netWeight}</span>
+                </div>
+              )}
+              {(product as any).shelfLife && (
+                <div className="space-y-0.5">
+                  <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Shelf Life</span>
+                  <span className="font-semibold text-stone-800">{(product as any).shelfLife}</span>
                 </div>
               )}
             </div>

@@ -93,6 +93,7 @@ export default function ProductCard({ product }: { product: Product }) {
                 alt={product.name}
                 width={400}
                 height={400}
+                unoptimized={product.image?.startsWith("data:")}
                 className="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
                 onError={() => setImageError(true)}
               />
