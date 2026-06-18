@@ -74,8 +74,7 @@ function AdminLayoutInner({
 
   const SidebarContent = () => (
     <>
-      {/* Logo */}
-      <div className="px-5 py-6 border-b border-[#e0e7e2] flex items-center justify-between">
+      <div className="px-5 pt-[calc(env(safe-area-inset-top,0px)+1.5rem)] pb-6 border-b border-[#e0e7e2] flex items-center justify-between">
         <button onClick={() => { setActiveTab("overview"); setSidebarOpen(false); }} className="flex items-center gap-2.5 text-left cursor-pointer">
           <span className="w-8 h-8 rounded-xl bg-[#2d6a4f] text-white flex items-center justify-center font-bold text-sm shadow-sm">
             A
@@ -86,10 +85,11 @@ function AdminLayoutInner({
         </button>
         {/* Close button — mobile only */}
         <button
-          className="md:hidden text-[#5c6b62] hover:text-[#1e2521] p-1 cursor-pointer"
+          className="md:hidden text-[#5c6b62] hover:text-[#1e2521] p-3 -mr-3 rounded-full hover:bg-stone-100 cursor-pointer transition-colors"
           onClick={() => setSidebarOpen(false)}
+          aria-label="Close sidebar"
         >
-          <X className="w-5 h-5" />
+          <X className="w-6 h-6" />
         </button>
       </div>
 

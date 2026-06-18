@@ -503,7 +503,7 @@ export default function Header() {
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200">
+        <div className="flex items-center justify-between px-5 pt-[calc(env(safe-area-inset-top,0px)+1rem)] pb-4 border-b border-stone-200">
           <Link
             href="/"
             onClick={() => setIsMobileMenuOpen(false)}
@@ -513,9 +513,10 @@ export default function Header() {
           </Link>
           <button
             onClick={toggleMobileMenu}
-            className="p-1.5 text-stone-400 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-colors"
+            className="p-3 -mr-3 text-stone-400 hover:text-stone-900 hover:bg-stone-100 rounded-full transition-colors"
+            aria-label="Close menu"
           >
-            <X className="w-5 h-5" />
+            <X className="w-6 h-6" />
           </button>
         </div>
 
@@ -644,7 +645,7 @@ export default function Header() {
           </div>
         </nav>
 
-        <div className="px-5 py-4 border-t border-stone-200 bg-stone-50 flex items-center gap-3">
+        <div className="px-5 pt-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] border-t border-stone-200 bg-stone-50 flex items-center gap-3">
           <div className="w-8 h-8 bg-[#1a5c38] rounded-full flex items-center justify-center shrink-0">
             <Phone className="w-3.5 h-3.5 text-white" />
           </div>
