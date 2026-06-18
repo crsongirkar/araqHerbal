@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Edit2, RefreshCw, Plus, Trash2, X, GripVertical } from "lucide-react";
 import ImageUploader from "./ImageUploader";
 
@@ -31,9 +31,9 @@ export default function BannersTab({ banners: initialBanners, loading, onRefresh
   const [addingNew, setAddingNew] = useState(false);
 
   // Sync if parent passes new banners
-  if (initialBanners !== banners && !editingBanner) {
+  useEffect(() => {
     setBanners(initialBanners);
-  }
+  }, [initialBanners]);
 
   const newBannerTemplate = (): Banner => ({
     id: Date.now(),
@@ -59,6 +59,7 @@ export default function BannersTab({ banners: initialBanners, loading, onRefresh
       setEditingBanner(null);
       setAddingNew(false);
       showToast("Banners saved!", "success");
+      onRefresh();
     } catch {
       showToast("Failed to save banners.", "error");
     } finally {
