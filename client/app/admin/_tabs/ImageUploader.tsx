@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useId } from "react";
 import Image from "next/image";
 import { Upload, Link, X, Loader2 } from "lucide-react";
 
@@ -15,6 +15,7 @@ export default function ImageUploader({ value, onChange, label = "Image" }: Imag
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const uploadId = useId();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -73,9 +74,9 @@ export default function ImageUploader({ value, onChange, label = "Image" }: Imag
         />
       ) : (
         <div>
-          <input ref={inputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" id="img-upload" />
+          <input ref={inputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" id={uploadId} />
           <label
-            htmlFor="img-upload"
+            htmlFor={uploadId}
             className={`flex items-center justify-center gap-2 w-full rounded-xl border-2 border-dashed py-4 cursor-pointer transition-colors ${uploading ? "border-[#2d6a4f] bg-[#e8f5e9]/40" : "border-[#e0e7e2] hover:border-[#2d6a4f] hover:bg-[#e8f5e9]/20"}`}
           >
             {uploading ? (
