@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -43,6 +42,31 @@ const DEFAULT_SLIDES = [
 export default function HeroCarousel() {
   const [slides, setSlides] = useState(DEFAULT_SLIDES);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    if (isLeftSwipe) {
+      nextSlide();
+    } else if (isRightSwipe) {
+      prevSlide();
+    }
+  };
 
   const fetchSlides = async () => {
     try {
@@ -78,7 +102,12 @@ export default function HeroCarousel() {
   if (slides.length === 0) return null;
 
   return (
-    <div className="relative w-full max-w-7xl mx-auto mb-10 sm:mb-16 overflow-hidden rounded-2xl sm:rounded-3xl shadow-sm border border-[#e0e7e2]">
+    <div 
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      className="relative w-full max-w-7xl mx-auto mb-10 sm:mb-16 overflow-hidden rounded-2xl sm:rounded-3xl shadow-sm border border-[#e0e7e2]"
+    >
       {/* Grid Pattern Overlay */}
       <div 
         className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none text-[#2d6a4f]" 
@@ -120,13 +149,13 @@ export default function HeroCarousel() {
 
             {/* Slide Image — shown on all screen sizes */}
             <div className="flex-1 w-full flex justify-center items-center z-10">
-              <div className="relative w-[220px] h-[220px] sm:w-[300px] sm:h-[300px] lg:w-[380px] lg:h-[380px] rounded-2xl overflow-hidden shadow-2xl border border-white/40 transform rotate-2 hover:rotate-0 transition-transform duration-500 bg-white">
+              <div className="relative w-full max-w-[280px] aspect-square sm:max-w-[340px] lg:max-w-[420px] rounded-2xl overflow-hidden shadow-xl border border-stone-200/60 bg-white transition-all duration-300">
                 <Image
                   src={slide.image}
                   alt={slide.title}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 640px) 220px, (max-width: 1024px) 300px, 380px"
+                  sizes="(max-width: 640px) 280px, (max-width: 1024px) 350px, 450px"
                   priority
                 />
               </div>
@@ -135,21 +164,6 @@ export default function HeroCarousel() {
         ))}
       </div>
 
-      {/* Navigation Arrows */}
-      <button
-        onClick={prevSlide}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 rounded-full bg-white/80 hover:bg-white text-[#1e2521] hover:text-[#2d6a4f] shadow-lg border border-[#e0e7e2] transition-all hover:scale-105 cursor-pointer"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
-      </button>
-      <button
-        onClick={nextSlide}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 rounded-full bg-white/80 hover:bg-white text-[#1e2521] hover:text-[#2d6a4f] shadow-lg border border-[#e0e7e2] transition-all hover:scale-105 cursor-pointer"
-        aria-label="Next slide"
-      >
-        <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
-      </button>
 
       {/* Slide Indicators */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
