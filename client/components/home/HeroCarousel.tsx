@@ -124,11 +124,11 @@ export default function HeroCarousel() {
       >
         {slides.map((slide) => (
           <div
-          key={slide.id}
-            className={`w-full shrink-0 flex flex-col md:flex-row items-center justify-between px-5 py-8 sm:p-12 lg:p-16 bg-gradient-to-br ${slide.bgClass || "from-stone-100 via-stone-50 to-stone-100/60"} min-h-[360px] sm:min-h-[480px] md:min-h-[520px] gap-6 md:gap-8`}
+            key={slide.id}
+            className={`w-full shrink-0 flex flex-col md:flex-row items-center justify-between px-5 py-8 sm:p-12 lg:p-16 bg-gradient-to-br ${slide.bgClass || "from-stone-100 via-stone-50 to-stone-100/60"} min-h-[540px] sm:min-h-[480px] md:min-h-[520px] gap-6 md:gap-8`}
           >
             {/* Slide Content */}
-            <div className="flex-1 space-y-4 sm:space-y-6 max-w-xl text-left z-10">
+            <div className="w-full md:flex-1 space-y-4 sm:space-y-6 max-w-xl text-left z-10">
               <span className="inline-block text-[10px] sm:text-xs font-semibold tracking-widest text-[#2d6a4f] bg-[#e8f5e9] px-3 py-1 rounded-full">
                 {slide.tagline}
               </span>
@@ -148,14 +148,14 @@ export default function HeroCarousel() {
             </div>
 
             {/* Slide Image — shown on all screen sizes */}
-            <div className="flex-1 w-full flex justify-center items-center z-10">
-              <div className="relative w-full max-w-[280px] aspect-square sm:max-w-[340px] lg:max-w-[420px] rounded-2xl overflow-hidden shadow-xl border border-stone-200/60 bg-white transition-all duration-300">
+            <div className="w-full md:flex-1 flex justify-center items-center z-10">
+              <div className="relative w-full max-w-[240px] aspect-square sm:max-w-[340px] lg:max-w-[420px] rounded-2xl overflow-hidden shadow-xl border border-stone-200/60 bg-white transition-all duration-300">
                 <Image
                   src={slide.image}
                   alt={slide.title}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 640px) 280px, (max-width: 1024px) 350px, 450px"
+                  sizes="(max-width: 640px) 240px, (max-width: 1024px) 340px, 420px"
                   priority
                 />
               </div>
