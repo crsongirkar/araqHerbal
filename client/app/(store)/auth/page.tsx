@@ -200,8 +200,8 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-[70vh] bg-gradient-to-br from-[#fbfbfa] via-[#e8f5e9]/10 to-[#fbfbfa] flex items-center justify-center px-4 py-16 font-sans">
-      <div className="w-full max-w-md bg-white border border-[#e0e7e2] rounded-[32px] p-8 shadow-sm transition-all duration-300">
+    <div className="min-h-[70vh] bg-gradient-to-br from-[#fbfbfa] via-[#e8f5e9]/10 to-[#fbfbfa] flex items-center justify-center px-4 py-12 sm:py-16 font-sans">
+      <div className="w-full max-w-md bg-white border border-[#e0e7e2] rounded-[32px] p-6 sm:p-8 shadow-sm transition-all duration-300">
         
         {/* Step 1: Email Input */}
         {step === "email" && (
@@ -303,7 +303,7 @@ export default function AuthPage() {
                 <label className="text-[10px] font-bold text-[#1e2521] tracking-widest uppercase block text-center mb-4">
                   Verification Passcode
                 </label>
-                <div className="flex justify-between gap-2.5">
+                <div className="flex justify-between gap-1.5 sm:gap-2.5">
                   {otp.map((digit, idx) => (
                     <input
                       key={idx}
@@ -316,7 +316,7 @@ export default function AuthPage() {
                       onChange={(e) => handleOtpChange(idx, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(idx, e)}
                       onPaste={idx === 0 ? handlePaste : undefined}
-                      className="w-12 h-14 rounded-2xl border border-[#e0e7e2] text-center text-xl font-bold font-mono focus:outline-none focus:border-[#2a7a4b] focus:ring-4 focus:ring-[#2a7a4b]/5 transition-all text-[#1e2521] bg-stone-50/50"
+                      className="flex-1 min-w-0 h-12 sm:h-14 rounded-2xl border border-[#e0e7e2] text-center text-lg sm:text-xl font-bold font-mono focus:outline-none focus:border-[#2a7a4b] focus:ring-4 focus:ring-[#2a7a4b]/5 transition-all text-[#1e2521] bg-stone-50/50"
                     />
                   ))}
                 </div>

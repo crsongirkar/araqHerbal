@@ -96,7 +96,7 @@ export default function Product() {
   const originalPrice = product.originalPrice || product.price * 1.25;
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
       <ProductBreadcrumb />
 
       <div className="grid lg:grid-cols-2 gap-12 mb-16">
@@ -155,7 +155,7 @@ export default function Product() {
               {product.category}
             </span>
           )}
-          <h1 className="text-3xl lg:text-4xl font-serif font-semibold text-[#1e2521] mb-2">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-semibold text-[#1e2521] mb-2">
             {product.name}
           </h1>
           <div className="flex items-center gap-2 mb-4">

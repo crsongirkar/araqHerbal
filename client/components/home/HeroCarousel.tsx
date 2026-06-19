@@ -138,7 +138,7 @@ export default function HeroCarousel() {
           return (
             <div
               key={slide.id}
-              className={`w-full shrink-0 flex flex-col md:flex-row items-center justify-between px-5 py-8 sm:p-12 lg:p-16 ${hasGradient ? "bg-gradient-to-br" : ""} ${slide.bgClass || "bg-gradient-to-br from-stone-100 via-stone-50 to-stone-100/60"} min-h-[540px] sm:min-h-[480px] md:min-h-[520px] gap-6 md:gap-8`}
+              className={`w-full shrink-0 flex flex-col md:flex-row items-center justify-between px-4 pt-6 pb-8 sm:p-12 lg:p-16 ${hasGradient ? "bg-gradient-to-br" : ""} ${slide.bgClass || "bg-gradient-to-br from-stone-100 via-stone-50 to-stone-100/60"} min-h-[420px] sm:min-h-[480px] md:min-h-[520px] gap-4 md:gap-8`}
             >
               {/* Slide Content */}
               <div className="w-full md:flex-1 space-y-4 sm:space-y-6 max-w-xl text-left z-10">
@@ -174,7 +174,7 @@ export default function HeroCarousel() {
 
               {/* Slide Image — shown on all screen sizes */}
               <div className="w-full md:flex-1 flex justify-center items-center z-10">
-                <div className={`relative w-full max-w-[240px] aspect-square sm:max-w-[340px] lg:max-w-[420px] rounded-2xl overflow-hidden shadow-xl bg-white transition-all duration-300 ${
+                <div className={`relative w-full max-w-[180px] aspect-square sm:max-w-[340px] lg:max-w-[420px] rounded-2xl overflow-hidden shadow-xl bg-white transition-all duration-300 ${
                   isDark ? "border border-white/10 shadow-black/40" : "border border-stone-200/60"
                 }`}>
                   <Image

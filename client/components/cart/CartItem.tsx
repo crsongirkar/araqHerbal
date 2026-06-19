@@ -29,8 +29,8 @@ export default function CartItem({ item, isLast }: CartItemProps) {
 
   return (
     <div>
-      <div className="flex items-start gap-4">
-        <div className="relative w-[100px] h-[100px]">
+      <div className="flex items-start gap-3 sm:gap-4">
+        <div className="relative w-[72px] h-[72px] sm:w-[100px] sm:h-[100px] shrink-0">
           <Image
             src={item.image}
             alt={item.name}

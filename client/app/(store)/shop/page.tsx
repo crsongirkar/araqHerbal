@@ -49,12 +49,12 @@ function ShopContent() {
           <span className="text-[10px] font-bold tracking-widest text-[#2d6a4f] uppercase block mb-2">
             HERBAL REMEDIES
           </span>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-semibold text-[#1e2521] mb-3">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-semibold text-[#1e2521] mb-3">
             {searchQuery 
               ? `Results for "${searchQuery}"` 
               : categoryFilter || "All Products"}
           </h1>
-          <p className="text-[#5c6b62] text-sm sm:text-base max-w-lg">
+          <p className="text-[#5c6b62] text-xs sm:text-sm lg:text-base max-w-lg">
             {searchQuery
               ? `Found ${filteredProducts.length} herbal remedies matching your search terms.`
               : categoryFilter
@@ -96,7 +96,7 @@ function ShopContent() {
       {/* Product Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-24 py-8 sm:py-12">
         {filteredProducts.length > 0 ? (
-          <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-3 sm:gap-6 grid-cols-1 min-[380px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

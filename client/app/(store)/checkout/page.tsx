@@ -2,7 +2,7 @@
 
 import { useCart } from "@/context/CartContext";
 import { useProducts } from "@/context/ProductsContext";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,11 @@ export default function CheckoutPage() {
   const { cart, clearCart } = useCart();
   const { refreshProducts } = useProducts();
   const router = useRouter();
+
+  // ── Submission guard refs: prevent any double-submit ──
+  const isSubmittingRef = useRef(false);  // blocks double order creation
+  const whatsappConfirmShownRef = useRef(false);  // focus event fires only once
+  const whatsappPopupTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     refreshProducts();
@@ -78,8 +83,10 @@ export default function CheckoutPage() {
   }, []);
 
   useEffect(() => {
+    // Show the WhatsApp confirmation popup only ONCE when window regains focus
     const handleFocus = () => {
-      if (whatsappOrderSnapshot) {
+      if (whatsappOrderSnapshot && !whatsappConfirmShownRef.current) {
+        whatsappConfirmShownRef.current = true;
         setShowWhatsappConfirm(true);
       }
     };
@@ -185,6 +192,13 @@ Please confirm my order. Thank you! 🌿`;
   };
 
   const processDirectOrder = async (paymentId?: string) => {
+    // Guard: prevent duplicate order creation from Razorpay callback firing multiple times
+    if (isSubmittingRef.current) {
+      console.warn("processDirectOrder: submission already in progress, ignoring.");
+      setLoading(false);
+      return;
+    }
+    isSubmittingRef.current = true;
     try {
       const orderPayload = {
         customerName: `${firstName} ${lastName}`,
@@ -218,10 +232,12 @@ Please confirm my order. Thank you! 🌿`;
       } else {
         const data = await res.json().catch(() => ({}));
         setError(data.error || "Failed to process order. Please try again.");
+        isSubmittingRef.current = false; // allow retry on error
       }
     } catch (err) {
       console.error(err);
       setError("An error occurred. Check your network.");
+      isSubmittingRef.current = false; // allow retry on error
     } finally {
       setLoading(false);
     }
@@ -300,6 +316,8 @@ Please confirm my order. Thank you! 🌿`;
       total
     };
     setWhatsappOrderSnapshot(snapshot);
+    // Reset the "shown once" guard for this new WhatsApp order session
+    whatsappConfirmShownRef.current = false;
 
     // Build message template
     const itemsText = cart
@@ -335,37 +353,59 @@ Please confirm my order. Thank you! 🌿`;
 
     window.open(whatsappUrl, "_blank");
 
-    setTimeout(() => {
-      setShowWhatsappConfirm(true);
+    // Show popup after 3s as a fallback (in case focus event doesn't fire)
+    // Clear any previous timeout first
+    if (whatsappPopupTimeoutRef.current) clearTimeout(whatsappPopupTimeoutRef.current);
+    whatsappPopupTimeoutRef.current = setTimeout(() => {
+      if (!whatsappConfirmShownRef.current) {
+        whatsappConfirmShownRef.current = true;
+        setShowWhatsappConfirm(true);
+      }
     }, 3000);
   };
 
   // User confirms they placed the order on WhatsApp
   const handleWhatsappConfirmYes = async () => {
-    if (!whatsappOrderSnapshot) return;
+    // Guard: prevent double-click / double submission
+    if (isSubmittingRef.current || !whatsappOrderSnapshot) return;
+    isSubmittingRef.current = true;
     setConfirmLoading(true);
+
+    // Capture snapshot and clear state BEFORE the API call so the
+    // focus event handler cannot trigger another submission
+    const snapshot = { ...whatsappOrderSnapshot };
+    setWhatsappOrderSnapshot(null);
+    setShowWhatsappConfirm(false);
+    // Cancel the 3-second fallback timeout if it hasn't fired yet
+    if (whatsappPopupTimeoutRef.current) {
+      clearTimeout(whatsappPopupTimeoutRef.current);
+      whatsappPopupTimeoutRef.current = null;
+    }
+
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(whatsappOrderSnapshot),
+        body: JSON.stringify(snapshot),
       });
 
       if (res.ok) {
         const orderData = await res.json();
         setSuccessOrder(orderData);
         clearCart();
-        setShowWhatsappConfirm(false);
-        setWhatsappOrderSnapshot(null);
       } else {
         const data = await res.json().catch(() => ({}));
         setError(data.error || "Failed to record order. Please try again.");
-        setShowWhatsappConfirm(false);
+        // Restore snapshot so user can try again
+        setWhatsappOrderSnapshot(snapshot);
+        isSubmittingRef.current = false;
       }
     } catch (err) {
       console.error(err);
       setError("An error occurred. Check your network.");
-      setShowWhatsappConfirm(false);
+      // Restore snapshot so user can try again
+      setWhatsappOrderSnapshot(snapshot);
+      isSubmittingRef.current = false;
     } finally {
       setConfirmLoading(false);
     }
@@ -374,6 +414,11 @@ Please confirm my order. Thank you! 🌿`;
   const handleWhatsappConfirmNo = () => {
     setShowWhatsappConfirm(false);
     setWhatsappOrderSnapshot(null);
+    whatsappConfirmShownRef.current = false;
+    if (whatsappPopupTimeoutRef.current) {
+      clearTimeout(whatsappPopupTimeoutRef.current);
+      whatsappPopupTimeoutRef.current = null;
+    }
     // Cart stays intact, user can continue browsing
   };
 
@@ -496,11 +541,11 @@ Please confirm my order. Thank you! 🌿`;
         </div>
       )}
 
-      <div className="flex items-center gap-3 mb-8">
-        <Button variant="ghost" size="icon" asChild className="text-[#5c6b62]">
+      <div className="flex items-center gap-3 mb-6 sm:mb-8">
+        <Button variant="ghost" size="icon" asChild className="text-[#5c6b62] shrink-0">
           <Link href="/cart"><ArrowLeft className="w-5 h-5" /></Link>
         </Button>
-        <h1 className="text-3xl font-serif font-semibold text-[#1e2521]">Checkout</h1>
+        <h1 className="text-2xl sm:text-3xl font-serif font-semibold text-[#1e2521]">Checkout</h1>
       </div>
 
       {error && (
@@ -509,7 +554,7 @@ Please confirm my order. Thank you! 🌿`;
         </div>
       )}
 
-      <div className="grid lg:grid-cols-3 gap-8 items-start">
+      <div className="grid lg:grid-cols-3 gap-6 sm:gap-8 items-start">
         {/* Form billing details */}
         <form onSubmit={(e) => e.preventDefault()} className="lg:col-span-2 space-y-8">
           {/* Shipping Section */}

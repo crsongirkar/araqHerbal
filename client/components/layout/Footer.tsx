@@ -98,7 +98,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-[#F8F5EE] text-[#1A1A1A] border-t border-[#DDD8CC] pt-20 pb-10 px-4 sm:px-12 lg:px-24">
+    <footer className="bg-[#F8F5EE] text-[#1A1A1A] border-t border-[#DDD8CC] pt-12 sm:pt-20 pb-8 sm:pb-10 px-4 sm:px-8 lg:px-24">
       <div className="max-w-7xl mx-auto space-y-16">
         {/* Newsletter Section */}
         <div className="bg-white rounded-[32px] p-5 sm:p-8 md:p-10 border border-[#E5E0D4] shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
@@ -164,7 +164,7 @@ export default function Footer() {
           <div className="lg:col-span-2">
             <Link
               href="/"
-              className="text-4xl font-serif font-semibold tracking-[0.3em] text-[#2F5D50]"
+              className="text-3xl sm:text-4xl font-serif font-semibold tracking-[0.3em] text-[#2F5D50]"
             >
               ARAQ
             </Link>

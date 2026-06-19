@@ -142,11 +142,11 @@ export default function CategoryGrid() {
   };
 
   return (
-    <section className="bg-white py-10 lg:py-12">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+    <section className="bg-white py-8 lg:py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8 gap-4">
-          <h2 className="text-2xl sm:text-3xl md:text-[38px] font-serif font-bold text-[#1D1D1D] leading-tight">
+        <div className="flex items-center justify-between mb-6 sm:mb-8 gap-4">
+          <h2 className="text-xl sm:text-2xl md:text-[38px] font-serif font-bold text-[#1D1D1D] leading-tight">
             Popular Category
           </h2>
 
@@ -219,8 +219,8 @@ export default function CategoryGrid() {
                   href={category.href}
                   className="
                     shrink-0
-                    w-[220px]
-                    h-[200px]
+                    w-[160px] sm:w-[200px] md:w-[220px]
+                    h-[170px] sm:h-[190px] md:h-[200px]
                     rounded-[18px]
                     border
                     border-[#E7E7E7]

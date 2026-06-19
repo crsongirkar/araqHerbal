@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
 const { adminAuth } = require("../utils/authMiddleware");
 
 // Load models
@@ -195,6 +196,26 @@ router.post("/orders", async (req, res) => {
       return res.status(400).json({ error: "Customer phone number is required." });
     }
 
+    // ── Deduplication Guard ──────────────────────────────────────────────
+    // If this customer placed an order with the same total within the last
+    // 60 seconds, return that existing order instead of creating a duplicate.
+    const sixtySecondsAgo = new Date(Date.now() - 60 * 1000);
+    const customerEmail = (body.customerEmail || "").trim().toLowerCase();
+    const customerPhone = body.customerPhone.trim();
+    const recentDuplicate = await Order.findOne({
+      customerEmail,
+      customerPhone,
+      total: parseFloat(body.total),
+      // Only look at orders created in the last 60 seconds
+      // (the date field is a string, so we use _id timestamp instead)
+    }).where('_id').gt(mongoose.Types.ObjectId.createFromTime(Math.floor(sixtySecondsAgo.getTime() / 1000)));
+
+    if (recentDuplicate) {
+      console.log(`Dedup: returning existing order #${recentDuplicate.id} for ${customerEmail}`);
+      return res.status(201).json(recentDuplicate);
+    }
+    // ── End Deduplication Guard ──────────────────────────────────────────
+
     // 1. Validate stock level for all items in order
     for (const item of items) {
       const product = await Product.findOne({ id: item.id });
@@ -217,8 +238,8 @@ router.post("/orders", async (req, res) => {
     const newOrder = new Order({
       customerName: body.customerName,
       // Always store email in lowercase so user order-history lookup always matches
-      customerEmail: (body.customerEmail || "").trim().toLowerCase(),
-      customerPhone: body.customerPhone.trim(),
+      customerEmail,
+      customerPhone,
       items: items,
       subtotal: parseFloat(body.subtotal),
       shipping: parseFloat(body.shipping),

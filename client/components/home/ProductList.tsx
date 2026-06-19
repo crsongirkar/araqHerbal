@@ -19,7 +19,7 @@ export default function ProductList() {
   const featuredProducts = products.slice(0, 6);
 
   return (
-    <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
+    <div className="grid gap-3 sm:gap-6 grid-cols-1 min-[380px]:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
       {featuredProducts.length > 0 ? (
         featuredProducts.map((product) => (
           <ProductCard key={product.id} product={product} />

@@ -104,13 +104,13 @@ export default function Contact() {
             <Badge className="mb-6 bg-primary text-primary-foreground">
               Get in Touch
             </Badge>
-            <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-6">
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-foreground mb-6">
               We&apos;d love to{" "}
               <span className="text-primary block lg:inline lg:ml-4">
                 hear from you
               </span>
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
               Have a question, suggestion, or just want to say hello? We&apos;re
               here to help and would love to hear from you.
             </p>

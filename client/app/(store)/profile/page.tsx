@@ -246,14 +246,14 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50/50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-stone-50/50 py-8 sm:py-12 px-3 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-8">
 
         {/* Page Heading */}
-        <div className="flex items-center justify-between border-b border-[#e0e7e2] pb-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#e0e7e2] pb-4 sm:pb-5 gap-2 sm:gap-0">
           <div className="space-y-1">
-            <h1 className="text-3xl font-serif font-bold text-[#1e2521]">My Account</h1>
-            <p className="text-xs text-stone-500 font-medium">
+            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#1e2521]">My Account</h1>
+            <p className="text-xs text-stone-500 font-medium truncate max-w-[280px] sm:max-w-none">
               Logged in as: <span className="font-bold text-[#2d6a4f]">{user?.email}</span>
             </p>
           </div>
@@ -271,10 +271,11 @@ export default function ProfilePage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8 items-start">
 
-          {/* Sidebar Nav */}
-          <div className="bg-white border border-[#e0e7e2] rounded-3xl p-3 shadow-sm space-y-1.5 lg:col-span-1">
+          {/* Sidebar Nav - horizontal scroll on mobile */}
+          <div className="bg-white border border-[#e0e7e2] rounded-3xl p-2 sm:p-3 shadow-sm lg:col-span-1">
+            <div className="flex lg:flex-col gap-1 overflow-x-auto no-scrollbar">
             {([
               { key: "profile", icon: <UserIcon className="w-4 h-4" />, label: "Update Profile" },
               { key: "address", icon: <MapPin className="w-4 h-4" />, label: "My Addresses" },
@@ -283,13 +284,14 @@ export default function ProfilePage() {
               <button
                 key={t.key}
                 onClick={() => { setActiveTab(t.key); setError(""); setSuccess(""); setShowAddrForm(false); }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                className={`shrink-0 lg:w-full flex items-center gap-2.5 px-3 py-2.5 lg:px-4 lg:py-3 rounded-2xl text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                   activeTab === t.key ? "bg-[#2d6a4f] text-white shadow-sm" : "text-stone-600 hover:bg-stone-50 hover:text-stone-900"
                 }`}
               >
                 {t.icon} {t.label}
               </button>
             ))}
+            </div>
           </div>
 
           {/* Content Panel */}
