@@ -10,7 +10,7 @@ const BLOG_POSTS = [
     excerpt: "Discover why we cure our handcrafted bars for exactly six weeks, and how this slow process preserves the active botanical nutrients for your skin.",
     date: "June 12, 2026",
     category: "Craftsmanship",
-    image: "https://images.unsplash.com/photo-1607006342445-360f141b0eba?q=80&w=600&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1546554137-f86b9593a222?q=80&w=600&auto=format&fit=crop",
     readTime: "5 min read"
   },
   {

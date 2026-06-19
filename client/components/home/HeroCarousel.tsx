@@ -14,7 +14,7 @@ const DEFAULT_SLIDES = [
     description: "Infused with organic plant oils, raw mineral salts, and therapeutic essential oils. Hand-poured in small batches for genuine wellness.",
     buttonText: "Shop Collection",
     buttonLink: "/shop",
-    image: "https://images.unsplash.com/photo-1607006342445-360f141b0eba?q=80&w=600&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1546554137-f86b9593a222?q=80&w=600&auto=format&fit=crop",
     bgClass: "from-stone-100 via-stone-50 to-stone-100/60"
   },
   {
@@ -24,7 +24,7 @@ const DEFAULT_SLIDES = [
     description: "An intensive moisturizing bar crafted with pure wild-harvested Kokum butter to deeply hydrate and repair dry, compromised skin.",
     buttonText: "View Repair Bar",
     buttonLink: "/product/2",
-    image: "https://images.unsplash.com/photo-1605264964528-06403738d6df?q=80&w=600&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=600&auto=format&fit=crop",
     bgClass: "from-stone-50 via-stone-100 to-stone-50"
   },
   {
@@ -34,7 +34,7 @@ const DEFAULT_SLIDES = [
     description: "Melt away muscle tension and physical stress with raw magnesium chloride, Epsom salts, and calming wild lavender essential oils.",
     buttonText: "Explore Muscle Relief",
     buttonLink: "/product/1",
-    image: "https://images.unsplash.com/photo-1547887537-6158d64c35b3?q=80&w=600&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?q=80&w=600&auto=format&fit=crop",
     bgClass: "from-stone-100 via-stone-50 to-stone-100/50"
   }
 ];
@@ -184,6 +184,7 @@ export default function HeroCarousel() {
                     className="object-cover"
                     sizes="(max-width: 640px) 240px, (max-width: 1024px) 340px, 420px"
                     priority
+                    unoptimized={slide.image?.startsWith("data:")}
                   />
                 </div>
               </div>

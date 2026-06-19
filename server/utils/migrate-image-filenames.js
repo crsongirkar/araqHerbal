@@ -2,39 +2,49 @@ const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
 
-const uploadsDir = path.join(__dirname, "..", "..", "client", "public", "uploads");
 const productsJsonPath = path.join(__dirname, "..", "..", "client", "data", "products.json");
 const homepageJsonPath = path.join(__dirname, "..", "..", "client", "data", "homepage.json");
 
 const Product = require("../models/Product");
 const Banner = require("../models/Banner");
 
-const dbUri = "mongodb+srv://crsongirkar2_db_user:cZoQZ8rYLI1rTK3b@cluster0.cdgplp0.mongodb.net/bloom_dev?retryWrites=true&w=majority&appName=Cluster0";
+// Connect to production 'bloom' database
+const dbUri = "mongodb+srv://crsongirkar2_db_user:cZoQZ8rYLI1rTK3b@cluster0.cdgplp0.mongodb.net/bloom?retryWrites=true&w=majority&appName=Cluster0";
 
 async function runMigration() {
   await mongoose.connect(dbUri);
-  console.log("Connected to database.");
+  console.log("Connected to production database.");
 
-  const files = fs.readdirSync(uploadsDir);
   const renameMapping = {}; // oldFilename -> newFilename
 
-  for (const file of files) {
-    if (file === ".gitkeep") continue;
-    const ext = path.extname(file);
-    const base = path.basename(file, ext);
+  const checkAndMap = (imgUrl) => {
+    if (imgUrl && !imgUrl.startsWith("http")) {
+      const filename = imgUrl.replace(/^\/?uploads\//, "");
+      const ext = path.extname(filename);
+      const base = path.basename(filename, ext);
+      if (base.includes(".")) {
+        const newBase = base.replace(/\./g, "_");
+        renameMapping[imgUrl] = `/uploads/${newBase}${ext}`;
+      }
+    }
+  };
 
-    if (base.includes(".")) {
-      const newBase = base.replace(/\./g, "_");
-      const newFile = `${newBase}${ext}`;
-
-      const oldPath = path.join(uploadsDir, file);
-      const newPath = path.join(uploadsDir, newFile);
-
-      console.log(`Renaming on disk: ${file} -> ${newFile}`);
-      fs.renameSync(oldPath, newPath);
-      renameMapping[`/uploads/${file}`] = `/uploads/${newFile}`;
+  // Build mapping from Products
+  const dbProducts = await Product.find({});
+  for (const prod of dbProducts) {
+    checkAndMap(prod.image);
+    if (prod.images) {
+      prod.images.forEach(checkAndMap);
     }
   }
+
+  // Build mapping from Banners
+  const dbBanners = await Banner.find({});
+  for (const banner of dbBanners) {
+    checkAndMap(banner.image);
+  }
+
+  console.log("Constructed Rename Mapping:", JSON.stringify(renameMapping, null, 2));
 
   // Update products.json
   if (fs.existsSync(productsJsonPath)) {
@@ -57,7 +67,6 @@ async function runMigration() {
   }
 
   // Update Products in DB
-  const dbProducts = await Product.find({});
   for (const prod of dbProducts) {
     let modified = false;
     if (renameMapping[prod.image]) {
@@ -80,7 +89,6 @@ async function runMigration() {
   }
 
   // Update Banners in DB
-  const dbBanners = await Banner.find({});
   for (const banner of dbBanners) {
     if (renameMapping[banner.image]) {
       banner.image = renameMapping[banner.image];
