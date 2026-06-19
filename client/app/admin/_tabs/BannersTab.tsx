@@ -10,6 +10,13 @@ interface Banner {
 }
 
 const BG_OPTIONS = [
+  // Light Gradients
+  "from-stone-100 via-stone-50 to-stone-100/60",
+  "from-emerald-50 via-stone-50 to-emerald-50/50",
+  "from-amber-50 via-stone-50 to-amber-50/50",
+  "from-teal-50 via-stone-50 to-teal-50/50",
+  "from-rose-50 via-stone-50 to-rose-50/50",
+  // Dark Gradients
   "from-stone-900 via-stone-800 to-stone-700",
   "from-green-950 via-green-900 to-emerald-800",
   "from-slate-900 via-slate-800 to-slate-700",
@@ -170,9 +177,15 @@ function BannerForm({ banner, onChange, onSave, onCancel, saving }: {
         <div>
           <label className="text-[10px] font-bold text-[#1e2521] tracking-widest uppercase block mb-1.5">Background Style</label>
           <select value={banner.bgClass} onChange={e => onChange({ ...banner, bgClass: e.target.value })} className="w-full rounded-xl border border-[#e0e7e2] px-4 py-2.5 text-sm bg-white focus:outline-none focus:border-[#2d6a4f]">
-            {["from-stone-900 via-stone-800 to-stone-700", "from-green-950 via-green-900 to-emerald-800", "from-slate-900 via-slate-800 to-slate-700", "from-amber-950 via-amber-900 to-amber-800", "from-teal-950 via-teal-900 to-teal-800"].map(bg => (
-              <option key={bg} value={bg}>{bg.split(" ")[0].replace("from-", "").replace(/-\d+/, "").toUpperCase()}</option>
-            ))}
+            {BG_OPTIONS.map(bg => {
+              const isDark = bg.includes("-900") || bg.includes("-950") || bg.includes("-800") || bg.includes("-700");
+              const colorName = bg.split(" ")[0].replace("from-", "").replace(/-\d+/, "").toUpperCase();
+              return (
+                <option key={bg} value={bg}>
+                  {colorName} ({isDark ? "DARK" : "LIGHT"})
+                </option>
+              );
+            })}
           </select>
         </div>
       </div>

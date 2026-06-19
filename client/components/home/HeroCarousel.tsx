@@ -99,6 +99,15 @@ export default function HeroCarousel() {
     return () => clearInterval(timer);
   }, [slides.length]);
 
+  const isDarkBg = (bgClass?: string) => {
+    if (!bgClass) return false;
+    return bgClass.includes("-900") || 
+           bgClass.includes("-950") || 
+           bgClass.includes("-800") || 
+           bgClass.includes("-700") || 
+           bgClass.includes("-600");
+  };
+
   if (slides.length === 0) return null;
 
   return (
@@ -122,61 +131,87 @@ export default function HeroCarousel() {
         className="flex transition-transform duration-700 ease-in-out"
         style={{ transform: `translateX(-${currentSlide * 100}%)` }}
       >
-        {slides.map((slide) => (
-          <div
-            key={slide.id}
-            className={`w-full shrink-0 flex flex-col md:flex-row items-center justify-between px-5 py-8 sm:p-12 lg:p-16 bg-gradient-to-br ${slide.bgClass || "from-stone-100 via-stone-50 to-stone-100/60"} min-h-[540px] sm:min-h-[480px] md:min-h-[520px] gap-6 md:gap-8`}
-          >
-            {/* Slide Content */}
-            <div className="w-full md:flex-1 space-y-4 sm:space-y-6 max-w-xl text-left z-10">
-              <span className="inline-block text-[10px] sm:text-xs font-semibold tracking-widest text-[#2d6a4f] bg-[#e8f5e9] px-3 py-1 rounded-full">
-                {slide.tagline}
-              </span>
-              <h2 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-serif text-[#1e2521] font-semibold leading-tight tracking-tight">
-                {slide.title}
-              </h2>
-              <p className="text-[#5c6b62] text-sm sm:text-base max-w-md leading-relaxed line-clamp-3 sm:line-clamp-none">
-                {slide.description}
-              </p>
-              <div className="pt-1">
-                <Button size="lg" className="rounded-full px-6 sm:px-8 bg-[#2d6a4f] hover:bg-[#2d6a4f]/95 text-white font-medium shadow-md transition-all duration-300 hover:scale-[1.02] text-sm" asChild>
-                  <Link href={slide.buttonLink || "/shop"}>
-                    {slide.buttonText || "Shop Collection"}
-                  </Link>
-                </Button>
+        {slides.map((slide) => {
+          const isDark = isDarkBg(slide.bgClass);
+          const hasGradient = slide.bgClass && (slide.bgClass.includes("from-") || slide.bgClass.includes("to-") || slide.bgClass.includes("via-"));
+          
+          return (
+            <div
+              key={slide.id}
+              className={`w-full shrink-0 flex flex-col md:flex-row items-center justify-between px-5 py-8 sm:p-12 lg:p-16 ${hasGradient ? "bg-gradient-to-br" : ""} ${slide.bgClass || "bg-gradient-to-br from-stone-100 via-stone-50 to-stone-100/60"} min-h-[540px] sm:min-h-[480px] md:min-h-[520px] gap-6 md:gap-8`}
+            >
+              {/* Slide Content */}
+              <div className="w-full md:flex-1 space-y-4 sm:space-y-6 max-w-xl text-left z-10">
+                <span className={`inline-block text-[10px] sm:text-xs font-semibold tracking-widest px-3 py-1 rounded-full ${
+                  isDark 
+                    ? "text-emerald-300 bg-white/10" 
+                    : "text-[#2d6a4f] bg-[#e8f5e9]"
+                }`}>
+                  {slide.tagline}
+                </span>
+                <h2 className={`text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-serif font-semibold leading-tight tracking-tight ${
+                  isDark ? "text-white" : "text-[#1e2521]"
+                }`}>
+                  {slide.title}
+                </h2>
+                <p className={`text-sm sm:text-base max-w-md leading-relaxed line-clamp-3 sm:line-clamp-none ${
+                  isDark ? "text-stone-300" : "text-[#5c6b62]"
+                }`}>
+                  {slide.description}
+                </p>
+                <div className="pt-1">
+                  <Button size="lg" className={`rounded-full px-6 sm:px-8 font-medium shadow-md transition-all duration-300 hover:scale-[1.02] text-sm ${
+                    isDark 
+                      ? "bg-white text-[#1e2521] hover:bg-stone-100" 
+                      : "bg-[#2d6a4f] text-white hover:bg-[#2d6a4f]/95"
+                  }`} asChild>
+                    <Link href={slide.buttonLink || "/shop"}>
+                      {slide.buttonText || "Shop Collection"}
+                    </Link>
+                  </Button>
+                </div>
               </div>
-            </div>
 
-            {/* Slide Image — shown on all screen sizes */}
-            <div className="w-full md:flex-1 flex justify-center items-center z-10">
-              <div className="relative w-full max-w-[240px] aspect-square sm:max-w-[340px] lg:max-w-[420px] rounded-2xl overflow-hidden shadow-xl border border-stone-200/60 bg-white transition-all duration-300">
-                <Image
-                  src={slide.image}
-                  alt={slide.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 240px, (max-width: 1024px) 340px, 420px"
-                  priority
-                />
+              {/* Slide Image — shown on all screen sizes */}
+              <div className="w-full md:flex-1 flex justify-center items-center z-10">
+                <div className={`relative w-full max-w-[240px] aspect-square sm:max-w-[340px] lg:max-w-[420px] rounded-2xl overflow-hidden shadow-xl bg-white transition-all duration-300 ${
+                  isDark ? "border border-white/10 shadow-black/40" : "border border-stone-200/60"
+                }`}>
+                  <Image
+                    src={slide.image}
+                    alt={slide.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 240px, (max-width: 1024px) 340px, 420px"
+                    priority
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
 
       {/* Slide Indicators */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentSlide(index)}
-            className={`h-2 transition-all rounded-full cursor-pointer ${
-              currentSlide === index ? "w-8 bg-[#2d6a4f]" : "w-2 bg-stone-300"
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
+        {slides.map((_, index) => {
+          const slide = slides[index];
+          const isDark = slide && isDarkBg(slide.bgClass);
+          
+          return (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`h-2 transition-all rounded-full cursor-pointer ${
+                currentSlide === index 
+                  ? `w-8 ${isDark ? "bg-white" : "bg-[#2d6a4f]"}` 
+                  : `w-2 ${isDark ? "bg-white/40" : "bg-stone-300"}`
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          );
+        })}
       </div>
     </div>
   );
