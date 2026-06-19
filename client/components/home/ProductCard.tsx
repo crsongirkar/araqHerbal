@@ -9,6 +9,7 @@ import { Check, Eye, Heart, Share2, ShoppingCart, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Product {
   id: number;
@@ -27,9 +28,12 @@ export default function ProductCard({ product }: { product: Product }) {
   const [isAdding, setIsAdding] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
 
-  const { addToCart } = useCart();
+  const { cart, addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const isLiked = isInWishlist(product.id);
+  const router = useRouter();
+
+  const isInCart = cart.some((item) => item.id === product.id);
 
   // Handle default fallback values to populate VegShop-style details beautifully
   const ratingVal = product.rating || 5.0;
@@ -38,6 +42,11 @@ export default function ProductCard({ product }: { product: Product }) {
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (isInCart) {
+      router.push("/cart");
+      return;
+    }
 
     setIsAdding(true);
     await new Promise((resolve) => setTimeout(resolve, 300));
@@ -187,6 +196,8 @@ export default function ProductCard({ product }: { product: Product }) {
                 "w-full rounded-full border border-[#2d6a4f] transition-all duration-300 font-semibold text-xs py-5 cursor-pointer uppercase tracking-wider flex items-center justify-center gap-2",
                 product.stock === 0
                   ? "bg-stone-100 border-stone-300 text-stone-400 cursor-not-allowed hover:bg-stone-100 hover:text-stone-400"
+                  : isInCart
+                  ? "bg-[#2d6a4f] border-[#2d6a4f] text-white hover:bg-[#2d6a4f]/90"
                   : justAdded
                   ? "bg-green-600 border-green-600 text-white hover:bg-green-600"
                   : isAdding
@@ -194,10 +205,15 @@ export default function ProductCard({ product }: { product: Product }) {
                   : "bg-white text-[#2d6a4f] hover:bg-[#2d6a4f] hover:text-white"
               )}
               onClick={handleAddToCart}
-              disabled={isAdding || product.stock === 0}
+              disabled={(!isInCart && isAdding) || product.stock === 0}
             >
               {product.stock === 0 ? (
                 <span>Out of Stock</span>
+              ) : isInCart ? (
+                <>
+                  <span>Go to Cart</span>
+                  <ShoppingCart className="h-3.5 w-3.5" />
+                </>
               ) : isAdding ? (
                 <>
                   <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />

@@ -17,10 +17,10 @@ export default function CheckoutPage() {
     refreshProducts();
   }, [refreshProducts]);
 
-  // Form states
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [zipCode, setZipCode] = useState("");
@@ -32,7 +32,7 @@ export default function CheckoutPage() {
   const [user, setUser] = useState<any>(null);
   const [hasSavedAddress, setHasSavedAddress] = useState(false);
 
-  // WhatsApp order confirmation popup
+
   const [showWhatsappConfirm, setShowWhatsappConfirm] = useState(false);
   const [whatsappOrderSnapshot, setWhatsappOrderSnapshot] = useState<any>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -58,6 +58,9 @@ export default function CheckoutPage() {
             if (data.user.email) {
               setEmail(data.user.email);
             }
+            if (data.user.phone) {
+              setPhone(data.user.phone);
+            }
             const addr = data.user.address;
             if (addr && (addr.street || addr.city || addr.zipCode)) {
               setHasSavedAddress(true);
@@ -74,7 +77,6 @@ export default function CheckoutPage() {
     checkSession();
   }, []);
 
-  // Show WhatsApp confirmation popup when the tab becomes focused again (user came back)
   useEffect(() => {
     const handleFocus = () => {
       if (whatsappOrderSnapshot) {
@@ -101,37 +103,112 @@ export default function CheckoutPage() {
   };
 
   const validateForm = () => {
-    if (!firstName.trim() || !lastName.trim() || !email.trim() || !address.trim() || !city.trim() || !zipCode.trim()) {
+    if (!firstName.trim() || !lastName.trim() || !email.trim() || !phone.trim() || !address.trim() || !city.trim() || !zipCode.trim()) {
       setError("Please complete all shipping address fields.");
       return false;
     }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setError("Please enter a valid email address.");
+      return false;
+    }
+
+    // Phone number validation (10 digits, optional +91 or 91 prefix)
+    const phoneRegex = /^(?:\+91|91)?[6-9]\d{9}$/;
+    if (!phoneRegex.test(phone.trim())) {
+      setError("Please enter a valid 10-digit phone number.");
+      return false;
+    }
+
+    // PIN code validation (6 digits)
+    const pinRegex = /^\d{6}$/;
+    if (!pinRegex.test(zipCode.trim())) {
+      setError("Please enter a valid 6-digit PIN code.");
+      return false;
+    }
+
     setError("");
     return true;
   };
 
-  // Pay Online: places order in DB immediately
-  const handlePayOnline = async () => {
-    if (!validateForm()) return;
-    setLoading(true);
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if ((window as any).Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const openWhatsAppMessage = (order: any, isWhatsAppOrder: boolean) => {
+    const itemsText = order.items
+      .map((item: any) => `- ${item.name} x ${item.quantity} (₹${item.price.toFixed(2)} each)`)
+      .join("\n");
+
+    const paymentType = isWhatsAppOrder ? "WhatsApp Request (Pending)" : "Paid Online (Prepaid) 💳";
+
+    const message =
+`Hello ARAQ! 👋 I've placed an order:
+
+*🛒 Order Details*
+━━━━━━━━━━━━━━━━━━━━━
+*Order ID:* #${order.id}
+*Customer:* ${order.customerName}
+*Email:* ${order.customerEmail}
+*Phone:* ${order.customerPhone}
+*Payment Method:* ${paymentType}
+━━━━━━━━━━━━━━━━━━━━━
+
+*📦 Items Ordered:*
+${itemsText}
+
+━━━━━━━━━━━━━━━━━━━━━
+*💰 Order Summary:*
+Subtotal: ₹${order.subtotal.toFixed(2)}
+Shipping: ${order.shipping === 0 ? "FREE 🎉" : `₹${order.shipping.toFixed(2)}`}
+Tax: ₹${order.tax.toFixed(2)}
+*Total: ₹${order.total.toFixed(2)}*
+━━━━━━━━━━━━━━━━━━━━━
+
+Please confirm my order. Thank you! 🌿`;
+
+    const encodedText = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/919960361331?text=${encodedText}`;
+    window.open(whatsappUrl, "_blank");
+  };
+
+  const processDirectOrder = async (paymentId?: string) => {
     try {
+      const orderPayload = {
+        customerName: `${firstName} ${lastName}`,
+        customerEmail: email,
+        customerPhone: phone,
+        items: cart.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.image
+        })),
+        subtotal,
+        shipping,
+        tax,
+        total,
+        paymentMethod: paymentId ? "Razorpay Online" : "Online Fallback",
+        paymentId: paymentId || "FALLBACK_DIRECT"
+      };
+
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerName: `${firstName} ${lastName}`,
-          customerEmail: email,
-          items: cart.map(item => ({
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-            image: item.image
-          })),
-          subtotal,
-          shipping,
-          tax,
-          total
-        }),
+        body: JSON.stringify(orderPayload),
       });
 
       if (res.ok) {
@@ -150,14 +227,65 @@ export default function CheckoutPage() {
     }
   };
 
-  // WhatsApp: just open WA with template, NO order saved yet
+  const handlePayOnline = async () => {
+    if (!validateForm()) return;
+    setLoading(true);
+    setError("");
+
+    const isScriptLoaded = await loadRazorpayScript();
+
+    if (!isScriptLoaded || !(window as any).Razorpay) {
+      console.warn("Razorpay SDK failed to load. Falling back to direct order confirmation.");
+      await processDirectOrder();
+      return;
+    }
+
+    try {
+      const options = {
+        key: "rzp_test_T3QHGDeb3QU0jo",
+        amount: Math.round(total * 100),
+        currency: "INR",
+        name: "ARAQ Herbal",
+        description: "Order Payment",
+        prefill: {
+          name: `${firstName} ${lastName}`,
+          email: email,
+          contact: phone
+        },
+        theme: {
+          color: "#2d6a4f"
+        },
+        handler: async function (response: any) {
+          await processDirectOrder(response.razorpay_payment_id);
+        },
+        modal: {
+          ondismiss: function() {
+            setLoading(false);
+          }
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', function (response: any) {
+        console.error("Razorpay Payment Failed:", response ? response.error : null);
+        const errorDetail = response && response.error ? response.error.description : "";
+        setError(`Payment failed: ${errorDetail || "Transaction failed."} Please try again.`);
+        setLoading(false);
+      });
+      rzp.open();
+    } catch (err: any) {
+      console.error("Failed to initialize Razorpay checkout:", err);
+      await processDirectOrder();
+    }
+  };
+
   const handleWhatsappOrder = () => {
     if (!validateForm()) return;
 
-    // Save a snapshot of the current order details to use later if they confirm
     const snapshot = {
       customerName: `${firstName} ${lastName}`,
       customerEmail: email,
+      customerPhone: phone,
       address, city, zipCode,
       items: cart.map(item => ({
         id: item.id,
@@ -185,6 +313,7 @@ export default function CheckoutPage() {
 ━━━━━━━━━━━━━━━━━━━━━
 *Customer:* ${firstName} ${lastName}
 *Email:* ${email}
+*Phone:* ${phone}
 *Address:* ${address}, ${city} - ${zipCode}
 ━━━━━━━━━━━━━━━━━━━━━
 
@@ -204,11 +333,8 @@ Please confirm my order. Thank you! 🌿`;
     const encodedText = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/919960361331?text=${encodedText}`;
 
-    // Open WhatsApp in new tab
     window.open(whatsappUrl, "_blank");
 
-    // Show confirm popup immediately in case user quickly comes back
-    // (the focus listener will also trigger it)
     setTimeout(() => {
       setShowWhatsappConfirm(true);
     }, 3000);
@@ -245,7 +371,6 @@ Please confirm my order. Thank you! 🌿`;
     }
   };
 
-  // User says they did NOT place the order on WhatsApp
   const handleWhatsappConfirmNo = () => {
     setShowWhatsappConfirm(false);
     setWhatsappOrderSnapshot(null);
@@ -280,9 +405,10 @@ Please confirm my order. Thank you! 🌿`;
             </div>
           </div>
 
-          <div className="pt-2">
+          <div className="pt-2 space-y-3">
             <Button
-              className="w-full rounded-full bg-[#2d6a4f] hover:bg-[#2d6a4f]/90 text-white font-bold py-6 text-xs uppercase tracking-wider"
+              variant="outline"
+              className="w-full rounded-full border-[#2d6a4f] text-[#2d6a4f] hover:bg-stone-50 font-bold py-6 text-xs uppercase tracking-wider cursor-pointer"
               asChild
             >
               <Link href="/shop">Continue Shopping</Link>
@@ -438,16 +564,32 @@ Please confirm my order. Thank you! 🌿`;
               </div>
             </div>
 
-            <div>
-              <label className="text-[10px] font-bold text-[#1e2521] tracking-wider uppercase block mb-1.5">Email Address</label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="e.g. user@example.com"
-                className="w-full rounded-xl border border-[#e0e7e2] px-4 py-2.5 text-xs focus:outline-none focus:border-[#2d6a4f]"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-[10px] font-bold text-[#1e2521] tracking-wider uppercase block mb-1.5">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="e.g. user@example.com"
+                  className="w-full rounded-xl border border-[#e0e7e2] px-4 py-2.5 text-xs focus:outline-none focus:border-[#2d6a4f]"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-[#1e2521] tracking-wider uppercase block mb-1.5">Phone Number</label>
+                <input
+                  type="tel"
+                  required
+                  value={phone}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9+]/g, "");
+                    if (val.length <= 10) setPhone(val);
+                  }}
+                  placeholder="e.g. 1234567890"
+                  className="w-full rounded-xl border border-[#e0e7e2] px-4 py-2.5 text-xs focus:outline-none focus:border-[#2d6a4f]"
+                />
+              </div>
             </div>
 
             <div>
@@ -480,7 +622,10 @@ Please confirm my order. Thank you! 🌿`;
                   type="text"
                   required
                   value={zipCode}
-                  onChange={(e) => setZipCode(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "");
+                    if (val.length <= 6) setZipCode(val);
+                  }}
                   placeholder="e.g. 400001"
                   className="w-full rounded-xl border border-[#e0e7e2] px-4 py-2.5 text-xs focus:outline-none focus:border-[#2d6a4f]"
                 />

@@ -75,7 +75,7 @@ export default function SettingsTab({ showToast }: Props) {
                 { label: "Store Name", key: "storeName" as const, type: "text", placeholder: "ARAQ Herbal" },
                 { label: "Tagline", key: "storeTagline" as const, type: "text", placeholder: "Pure. Natural. Handcrafted." },
                 { label: "Email Address", key: "storeEmail" as const, type: "email", placeholder: "hello@yourstore.com" },
-                { label: "Phone Number", key: "storePhone" as const, type: "text", placeholder: "+1 (555) 000-0000" },
+                { label: "Phone Number", key: "storePhone" as const, type: "text", placeholder: "1234567890" },
               ].map(f => (
                 <div key={f.key}>
                   <label className="text-[10px] font-bold text-[#1e2521] tracking-widest uppercase block mb-1.5">{f.label}</label>

@@ -12,20 +12,29 @@ const OrderSchema = new mongoose.Schema({
   id: { type: Number, unique: true },
   customerName: { type: String, required: true },
   customerEmail: { type: String, required: true },
+  customerPhone: { type: String, required: true },
   items: [OrderItemSchema],
   subtotal: { type: Number, required: true },
   shipping: { type: Number, required: true },
   tax: { type: Number, required: true },
   total: { type: Number, required: true },
   date: { type: String, default: () => new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) },
-  status: { type: String, default: "Pending" } // Pending, Shipped, Delivered, Cancelled
+  status: { type: String, default: "Pending" } 
 });
 
-// Auto-increment ID hook
+
 OrderSchema.pre("save", async function(next) {
   if (this.isNew && !this.id) {
-    const lastDoc = await this.constructor.findOne({}, {}, { sort: { id: -1 } });
-    this.id = lastDoc && lastDoc.id ? lastDoc.id + 1 : 1001; // start orders from 1001
+    let uniqueId;
+    let isUnique = false;
+    while (!isUnique) {
+      uniqueId = Math.floor(100000000000 + Math.random() * 900000000000);
+      const existing = await this.constructor.findOne({ id: uniqueId });
+      if (!existing) {
+        isUnique = true;
+      }
+    }
+    this.id = uniqueId;
   }
   next();
 });

@@ -24,7 +24,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 export default function Product() {
-  const { addToCart } = useCart();
+  const { cart, addToCart } = useCart();
   const { products, loading, refreshProducts } = useProducts();
   const { productId } = useParams();
   const router = useRouter();
@@ -48,12 +48,18 @@ export default function Product() {
   }
 
   const product = products.find((p) => p.id === parseInt(productId as string));
+  const isInCart = product ? cart.some((item) => item.id === product.id) : false;
 
   if (!product) {
     return <ProductNotFound />;
   }
 
   const handleAddToCart = async () => {
+    if (isInCart) {
+      router.push("/cart");
+      return;
+    }
+
     setIsAdding(true);
 
     await new Promise((resolve) => setTimeout(resolve, 300));
@@ -283,15 +289,22 @@ export default function Product() {
                   "flex-1 h-12 transition-all duration-300 rounded-full font-bold text-xs sm:text-sm uppercase tracking-wider",
                   ((product as any).stock ?? 100) === 0
                     ? "bg-stone-200 border border-stone-300 text-stone-500 cursor-not-allowed hover:bg-stone-200 hover:text-stone-500"
+                    : isInCart
+                    ? "bg-[#2d6a4f] text-white hover:bg-[#2d6a4f]/90"
                     : justAdded
                     ? "bg-green-600 text-white hover:bg-green-600"
                     : "bg-[#2d6a4f] text-white hover:bg-[#2d6a4f]/90"
                 )}
                 onClick={handleAddToCart}
-                disabled={isAdding || ((product as any).stock ?? 100) === 0}
+                disabled={(!isInCart && isAdding) || ((product as any).stock ?? 100) === 0}
               >
                 {((product as any).stock ?? 100) === 0 ? (
                   <span>Out of Stock</span>
+                ) : isInCart ? (
+                  <div className="flex items-center gap-1.5 justify-center">
+                    <ShoppingCart className="h-4 w-4" />
+                    <span>Go to Cart</span>
+                  </div>
                 ) : isAdding ? (
                   <div className="flex items-center gap-1.5 justify-center">
                     <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />

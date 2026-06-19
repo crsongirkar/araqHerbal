@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { adminAuth } = require("../utils/authMiddleware");
 
 // Load models
 const Product = require("../models/Product");
@@ -10,6 +11,8 @@ const Blog = require("../models/Blog");
 const Banner = require("../models/Banner");
 const Seo = require("../models/Seo");
 const Setting = require("../models/Setting");
+const { sendEmail } = require("../utils/emailSender");
+const { getOrderConfirmationEmailTemplate } = require("../utils/emailTemplate");
 
 /* =========================================================================
    PRODUCTS ROUTING (/api/products)
@@ -31,7 +34,7 @@ router.get("/products", async (req, res) => {
   }
 });
 
-router.post("/products", async (req, res) => {
+router.post("/products", adminAuth, async (req, res) => {
   try {
     const body = req.body;
     const newProduct = new Product({
@@ -59,7 +62,7 @@ router.post("/products", async (req, res) => {
   }
 });
 
-router.put("/products", async (req, res) => {
+router.put("/products", adminAuth, async (req, res) => {
   try {
     const { id, _id, __v, ...updatedFields } = req.body;
     if (!id) return res.status(400).json({ error: "Product ID is required" });
@@ -82,7 +85,7 @@ router.put("/products", async (req, res) => {
   }
 });
 
-router.delete("/products", async (req, res) => {
+router.delete("/products", adminAuth, async (req, res) => {
   try {
     const { id } = req.query;
     if (!id) return res.status(400).json({ error: "Product ID is required" });
@@ -116,7 +119,7 @@ router.get("/categories", async (req, res) => {
   }
 });
 
-router.post("/categories", async (req, res) => {
+router.post("/categories", adminAuth, async (req, res) => {
   try {
     const { name, description } = req.body;
     if (!name || !name.trim()) {
@@ -132,7 +135,7 @@ router.post("/categories", async (req, res) => {
   }
 });
 
-router.put("/categories", async (req, res) => {
+router.put("/categories", adminAuth, async (req, res) => {
   try {
     const { id, _id, __v, ...fields } = req.body;
     if (!id) return res.status(400).json({ error: "ID required" });
@@ -151,7 +154,7 @@ router.put("/categories", async (req, res) => {
   }
 });
 
-router.delete("/categories", async (req, res) => {
+router.delete("/categories", adminAuth, async (req, res) => {
   try {
     const { id } = req.query;
     if (!id) return res.status(400).json({ error: "ID required" });
@@ -170,7 +173,11 @@ router.delete("/categories", async (req, res) => {
    ORDERS ROUTING (/api/orders)
    ========================================================================= */
 
-router.get("/orders", async (req, res) => {
+router.get("/orders", adminAuth, async (req, res) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  res.setHeader("Surrogate-Control", "no-store");
   try {
     const orders = await Order.find({});
     return res.json(orders);
@@ -183,6 +190,10 @@ router.post("/orders", async (req, res) => {
   try {
     const body = req.body;
     const items = body.items || [];
+
+    if (!body.customerPhone) {
+      return res.status(400).json({ error: "Customer phone number is required." });
+    }
 
     // 1. Validate stock level for all items in order
     for (const item of items) {
@@ -207,6 +218,7 @@ router.post("/orders", async (req, res) => {
       customerName: body.customerName,
       // Always store email in lowercase so user order-history lookup always matches
       customerEmail: (body.customerEmail || "").trim().toLowerCase(),
+      customerPhone: body.customerPhone.trim(),
       items: items,
       subtotal: parseFloat(body.subtotal),
       shipping: parseFloat(body.shipping),
@@ -216,13 +228,25 @@ router.post("/orders", async (req, res) => {
     });
 
     await newOrder.save();
+
+    // Send email asynchronously
+    try {
+      const { html, attachments } = getOrderConfirmationEmailTemplate(newOrder);
+      sendEmail(newOrder.customerEmail, `ARAQ Order Confirmation #${newOrder.id}`, html, attachments)
+        .catch(emailErr => {
+          console.error("Failed to send order confirmation email:", emailErr.message);
+        });
+    } catch (emailErr) {
+      console.error("Failed to generate order confirmation email:", emailErr.message);
+    }
+
     return res.status(201).json(newOrder);
   } catch (error) {
     return res.status(500).json({ error: "Failed to create order" });
   }
 });
 
-router.put("/orders", async (req, res) => {
+router.put("/orders", adminAuth, async (req, res) => {
   try {
     const { id, status } = req.body;
     if (!id) return res.status(400).json({ error: "Order ID is required" });
@@ -270,7 +294,6 @@ router.put("/orders", async (req, res) => {
   }
 });
 
-// POST /api/orders/track - Public endpoint to track order status
 router.post("/orders/track", async (req, res) => {
   try {
     const { orderId, email } = req.body;
@@ -319,7 +342,7 @@ router.get("/blog", async (req, res) => {
   }
 });
 
-router.post("/blog", async (req, res) => {
+router.post("/blog", adminAuth, async (req, res) => {
   try {
     const body = req.body;
     if (!body.title?.trim()) {
@@ -346,7 +369,7 @@ router.post("/blog", async (req, res) => {
   }
 });
 
-router.put("/blog", async (req, res) => {
+router.put("/blog", adminAuth, async (req, res) => {
   try {
     const { id, _id, __v, ...fields } = req.body;
     if (!id) return res.status(400).json({ error: "ID required" });
@@ -362,7 +385,7 @@ router.put("/blog", async (req, res) => {
   }
 });
 
-router.delete("/blog", async (req, res) => {
+router.delete("/blog", adminAuth, async (req, res) => {
   try {
     const { id } = req.query;
     if (!id) return res.status(400).json({ error: "ID required" });
@@ -397,7 +420,7 @@ router.get("/seo", async (req, res) => {
   }
 });
 
-router.put("/seo", async (req, res) => {
+router.put("/seo", adminAuth, async (req, res) => {
   try {
     const body = req.body;
     let seo = await Seo.findOne({});
@@ -430,7 +453,7 @@ router.get("/settings", async (req, res) => {
   }
 });
 
-router.put("/settings", async (req, res) => {
+router.put("/settings", adminAuth, async (req, res) => {
   try {
     const body = req.body;
     let setting = await Setting.findOne({});
@@ -449,7 +472,11 @@ router.put("/settings", async (req, res) => {
    USERS ROUTING (/api/users)
    ========================================================================= */
 
-router.get("/users", async (req, res) => {
+router.get("/users", adminAuth, async (req, res) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  res.setHeader("Surrogate-Control", "no-store");
   try {
     const users = await User.find({});
     return res.json(users);
@@ -458,7 +485,7 @@ router.get("/users", async (req, res) => {
   }
 });
 
-router.post("/users", async (req, res) => {
+router.post("/users", adminAuth, async (req, res) => {
   try {
     const body = req.body;
     if (!body.name?.trim() || !body.email?.trim()) {
@@ -484,7 +511,7 @@ router.post("/users", async (req, res) => {
   }
 });
 
-router.put("/users", async (req, res) => {
+router.put("/users", adminAuth, async (req, res) => {
   try {
     const { id, _id, __v, ...fields } = req.body;
     if (!id) return res.status(400).json({ error: "User ID is required" });
@@ -500,7 +527,7 @@ router.put("/users", async (req, res) => {
   }
 });
 
-router.delete("/users", async (req, res) => {
+router.delete("/users", adminAuth, async (req, res) => {
   try {
     const { id } = req.query;
     if (!id) return res.status(400).json({ error: "User ID is required" });
@@ -528,7 +555,7 @@ router.get("/homepage", async (req, res) => {
   }
 });
 
-router.put("/homepage", async (req, res) => {
+router.put("/homepage", adminAuth, async (req, res) => {
   try {
     const slides = req.body;
     if (!Array.isArray(slides)) {

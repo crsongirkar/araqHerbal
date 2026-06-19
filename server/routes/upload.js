@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs").promises;
+const { adminAuth } = require("../utils/authMiddleware");
 
 const uploadDir = path.join(__dirname, "..", "..", "client", "public", "uploads");
 
@@ -39,7 +40,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
 });
 
-router.post("/upload", upload.single("file"), async (req, res) => {
+router.post("/upload", adminAuth, upload.single("file"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file provided" });

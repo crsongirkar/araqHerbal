@@ -72,7 +72,7 @@ export default function Header() {
 
   const checkSession = useCallback(async () => {
     try {
-      const res = await fetch("/api/auth/session");
+      const res = await fetch("/api/auth/session", { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
         if (data.authenticated) {
@@ -116,7 +116,18 @@ export default function Header() {
   }, [isMobileMenuOpen]);
 
   const toggleMobileMenu = useCallback(() => setIsMobileMenuOpen((p) => !p), []);
-  const isActive = (path: string) => pathname === path;
+  const isActive = (href: string, label?: string) => {
+    if (label === "Home") {
+      return pathname === "/";
+    }
+    if (label === "Shop") {
+      return pathname.startsWith("/shop");
+    }
+    if (label === "Product") {
+      return pathname.startsWith("/product");
+    }
+    return pathname === href;
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -382,7 +393,7 @@ export default function Header() {
                   <Link
                     href={item.href}
                     className={`flex items-center gap-1 px-4 h-full text-[12px] font-semibold tracking-wide transition-colors whitespace-nowrap ${
-                      isActive(item.href)
+                      isActive(item.href, item.label)
                         ? "text-white bg-white/10"
                         : "text-white/85 hover:text-white hover:bg-white/10"
                     }`}
@@ -491,9 +502,10 @@ export default function Header() {
 
       {/* ── Mobile Overlay ── */}
       {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black/45 z-50 lg:hidden backdrop-blur-sm"
+        <button
+          className="fixed inset-0 w-full h-full bg-black/45 z-50 lg:hidden backdrop-blur-sm cursor-pointer border-none outline-none appearance-none"
           onClick={toggleMobileMenu}
+          aria-label="Close menu overlay"
         />
       )}
 
@@ -513,7 +525,7 @@ export default function Header() {
           </Link>
           <button
             onClick={toggleMobileMenu}
-            className="p-3 -mr-3 text-stone-400 hover:text-stone-900 hover:bg-stone-100 rounded-full transition-colors"
+            className="p-2.5 text-stone-400 hover:text-stone-900 hover:bg-stone-100 rounded-full transition-colors cursor-pointer"
             aria-label="Close menu"
           >
             <X className="w-6 h-6" />
@@ -552,7 +564,7 @@ export default function Header() {
               href={item.href}
               onClick={() => setIsMobileMenuOpen(false)}
               className={`flex items-center justify-between px-3 py-3 rounded-xl text-sm font-semibold transition-colors ${
-                isActive(item.href)
+                isActive(item.href, item.label)
                   ? "bg-emerald-50 text-[#1a5c38] font-bold"
                   : "text-stone-500 hover:bg-stone-100 hover:text-stone-900"
               }`}
@@ -651,7 +663,7 @@ export default function Header() {
           </div>
           <div className="leading-tight">
             <p className="text-[10px] text-stone-400">Hotline</p>
-            <p className="text-[13px] font-bold font-mono text-stone-900">(555) 762-7724</p>
+            <p className="text-[13px] font-bold font-mono text-stone-900">1234567890</p>
           </div>
         </div>
       </div>

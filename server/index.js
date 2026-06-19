@@ -48,4 +48,4 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 ARAQ Server running on http://localhost:${PORT}`);
 });
-// Nodemon trigger comment
+// Nodemon trigger comment v3

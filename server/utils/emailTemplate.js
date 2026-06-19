@@ -393,4 +393,259 @@ function getWelcomeEmailTemplate(userName) {
   `;
 }
 
-module.exports = { getOtpEmailTemplate, getSubscriptionEmailTemplate, getWelcomeEmailTemplate };
+function getOrderConfirmationEmailTemplate(order) {
+  const fs = require("fs");
+  const path = require("path");
+  const attachments = [];
+
+  const itemsHtml = order.items.map((item, index) => {
+    let imageUrl = "";
+    if (item.image) {
+      if (item.image.startsWith("http")) {
+        imageUrl = item.image;
+      } else {
+        const filename = item.image.replace(/^\/?uploads\//, "");
+        const filePath = path.join(__dirname, "..", "..", "client", "public", "uploads", filename);
+        if (fs.existsSync(filePath)) {
+          const cid = `item_image_${index}@araqherbal.com`;
+          attachments.push({
+            filename: filename,
+            path: filePath,
+            cid: cid
+          });
+          imageUrl = `cid:${cid}`;
+        } else {
+          imageUrl = `${process.env.CLIENT_URL || "http://localhost:3000"}${item.image.startsWith("/") ? "" : "/"}${item.image}`;
+        }
+      }
+    }
+
+    const imageHtml = imageUrl
+      ? `<td style="padding: 12px 12px 12px 0; border-bottom: 1px solid #f0f3f1; width: 60px; vertical-align: top;">
+           <img src="${imageUrl}" alt="${item.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid #e2ebd9;" />
+         </td>`
+      : "";
+
+    return `
+    <tr>
+      ${imageHtml}
+      <td style="padding: 12px 0; border-bottom: 1px solid #f0f3f1; font-size: 14px; color: #1e2521; vertical-align: top;">
+        <span style="font-weight: 600;">${item.name}</span>
+        <div style="font-size: 12px; color: #8c9c90; margin-top: 4px;">Qty: ${item.quantity}</div>
+      </td>
+      <td style="padding: 12px 0; border-bottom: 1px solid #f0f3f1; font-size: 14px; text-align: right; font-weight: 700; color: #1e2521; vertical-align: top;">
+        ₹${(item.price * item.quantity).toFixed(2)}
+      </td>
+    </tr>
+    `;
+  }).join("");
+
+  const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmation #${order.id}</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f6f8f6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      color: #2e3630;
+      -webkit-font-smoothing: antialiased;
+    }
+    .email-container {
+      max-width: 580px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid #e2ebd9;
+      box-shadow: 0 4px 20px rgba(45, 106, 79, 0.04);
+    }
+    .header {
+      background-color: #1a5c38;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .logo {
+      font-size: 26px;
+      letter-spacing: 0.22em;
+      color: #ffffff;
+      font-weight: 300;
+      font-family: Georgia, serif;
+      margin: 0;
+    }
+    .tagline {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: rgba(255, 255, 255, 0.7);
+      text-transform: uppercase;
+      margin-top: 8px;
+      font-weight: 600;
+    }
+    .content {
+      padding: 48px 40px;
+    }
+    .title {
+      font-size: 22px;
+      color: #1e2521;
+      margin: 0 0 16px 0;
+      font-family: Georgia, serif;
+      font-weight: 600;
+      text-align: center;
+    }
+    .description {
+      font-size: 14px;
+      color: #5c6b62;
+      line-height: 1.6;
+      margin: 0 0 32px 0;
+      text-align: center;
+    }
+    .order-card {
+      background-color: #f8fcf9;
+      border: 1px solid #e2ebd9;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+    .order-header {
+      border-bottom: 1px solid #e2ebd9;
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+    }
+    .order-id {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e2521;
+      font-family: Georgia, serif;
+    }
+    .order-date {
+      font-size: 12px;
+      color: #8c9c90;
+      margin-top: 4px;
+    }
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .summary-row td {
+      padding: 8px 0;
+      font-size: 13px;
+      color: #5c6b62;
+    }
+    .summary-total td {
+      padding: 16px 0 0 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: #2d6a4f;
+      border-top: 1px solid #e2ebd9;
+    }
+    .shipping-info {
+      font-size: 13px;
+      color: #5c6b62;
+      line-height: 1.6;
+      margin-top: 24px;
+      background-color: #f1f7f3;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .shipping-title {
+      font-weight: 700;
+      color: #1e2521;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+    .footer {
+      background-color: #fcfcfb;
+      padding: 24px;
+      text-align: center;
+      border-top: 1px solid #f0f3f1;
+      font-size: 11px;
+      color: #8c9c90;
+      line-height: 1.5;
+    }
+    .footer a {
+      color: #2d6a4f;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <h1 class="logo">ARAQ</h1>
+      <div class="tagline">Pure • Natural • Handcrafted</div>
+    </div>
+    
+    <div class="content">
+      <h2 class="title">Thank you for your order!</h2>
+      <p class="description">
+        Hello ${order.customerName},<br>
+        We have successfully received your order. Here is your receipt and delivery information:
+      </p>
+      
+      <div class="order-card">
+        <div class="order-header">
+          <div class="order-id">Order #${order.id}</div>
+          <div class="order-date">Placed on ${order.date}</div>
+        </div>
+        
+        <table class="items-table">
+          <tbody>
+            ${itemsHtml}
+            <tr class="summary-row">
+              <td style="padding-top: 16px;">Subtotal</td>
+              <td style="text-align: right; padding-top: 16px;">₹${order.subtotal.toFixed(2)}</td>
+            </tr>
+            <tr class="summary-row">
+              <td>Shipping</td>
+              <td style="text-align: right;">${order.shipping === 0 ? "FREE" : `₹${order.shipping.toFixed(2)}`}</td>
+            </tr>
+            <tr class="summary-row">
+              <td>Estimated Tax</td>
+              <td style="text-align: right;">₹${order.tax.toFixed(2)}</td>
+            </tr>
+            <tr class="summary-total">
+              <td>Total</td>
+              <td style="text-align: right;">₹${order.total.toFixed(2)}</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="shipping-info">
+          <div class="shipping-title">Contact & Delivery Information</div>
+          <strong>Email:</strong> ${order.customerEmail}<br>
+          <strong>Phone:</strong> ${order.customerPhone}<br>
+          <strong>Status:</strong> ${order.status}
+        </div>
+      </div>
+      
+      <p class="description" style="font-size: 13px; margin: 0;">
+        If you have any questions, feel free to contact us or send us a message on WhatsApp.
+      </p>
+    </div>
+    
+    <div class="footer">
+      © ${new Date().getFullYear()} ARAQ Herbal Inc. All rights reserved.<br>
+      Pure botanical elixirs, cold-process bars, and remedies.<br>
+      <a href="http://localhost:3000">Visit our website</a>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+  return { html, attachments };
+}
+
+module.exports = {
+  getOtpEmailTemplate,
+  getSubscriptionEmailTemplate,
+  getWelcomeEmailTemplate,
+  getOrderConfirmationEmailTemplate
+};

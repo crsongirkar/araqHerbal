@@ -1,97 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const nodemailer = require("nodemailer");
 const Otp = require("../models/Otp");
 const User = require("../models/User");
 const Order = require("../models/Order");
 const Subscriber = require("../models/Subscriber");
 const { getOtpEmailTemplate, getSubscriptionEmailTemplate, getWelcomeEmailTemplate } = require("../utils/emailTemplate");
+const { adminAuth, ADMIN_COOKIE_NAME, JWT_SECRET } = require("../utils/authMiddleware");
+const { sendEmail } = require("../utils/emailSender");
 
-const JWT_SECRET = process.env.JWT_SECRET || "araq_jwt_secret_token_key_123456";
 const USER_COOKIE_NAME = "araq_user_token";
 
 const ADMIN_USERNAME = "admin";
 const ADMIN_PASSWORD = "admin123";
-const ADMIN_COOKIE_NAME = "araq_admin_token";
-const ADMIN_COOKIE_VALUE = "authenticated_admin_session";
 
-// nodemailer transport setup (checks SMTP env values)
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "",
-  port: parseInt(process.env.SMTP_PORT) || 587,
-  secure: process.env.SMTP_PORT === "465",
-  auth: {
-    user: process.env.SMTP_USER || "",
-    pass: process.env.SMTP_PASS || ""
-  }
-});
 
-// Reusable helper supporting Vercel Email API proxy (works on Render) and SMTP (for local dev)
-const sendEmail = async (to, subject, html) => {
-  const emailApiSecret = process.env.EMAIL_API_SECRET;
-  const clientUrl = process.env.CLIENT_URL;
-  const smtpConfigured = process.env.SMTP_HOST && process.env.SMTP_USER;
-
-  if (emailApiSecret && clientUrl) {
-    try {
-      // Clean trailing slash from clientUrl if present
-      const baseUrl = clientUrl.endsWith("/") ? clientUrl.slice(0, -1) : clientUrl;
-      const response = await fetch(`${baseUrl}/api/send-email`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-email-api-secret": emailApiSecret
-        },
-        body: JSON.stringify({ to, subject, html })
-      });
-
-      if (response.ok) {
-        console.log(`[Vercel API Email] Email sent successfully to ${to}`);
-        return true;
-      } else {
-        const errText = await response.text();
-        console.error(`[Vercel API Email] Failed to send to ${to}:`, errText);
-        // Fallback to local SMTP if configured (useful for local development)
-        if (smtpConfigured && process.env.NODE_ENV !== "production") {
-          return await sendEmailSMTP(to, subject, html);
-        }
-        return false;
-      }
-    } catch (err) {
-      console.error(`[Vercel API Email] Error sending to ${to}:`, err.message);
-      if (smtpConfigured && process.env.NODE_ENV !== "production") {
-        return await sendEmailSMTP(to, subject, html);
-      }
-      return false;
-    }
-  } else if (smtpConfigured) {
-    return await sendEmailSMTP(to, subject, html);
-  } else {
-    console.log(`[Email Skipped] No email provider configured (to: ${to}, subject: ${subject})`);
-    return false;
-  }
-};
-
-// Extracted SMTP sender logic
-const sendEmailSMTP = async (to, subject, html) => {
-  try {
-    const mailOptions = {
-      from: process.env.SMTP_FROM || `"ARAQ Herbal" <hello@araqherbal.com>`,
-      to,
-      subject,
-      html
-    };
-    await transporter.sendMail(mailOptions);
-    console.log(`[SMTP Email] Email sent successfully to ${to}`);
-    return true;
-  } catch (err) {
-    console.error(`[SMTP Email] Failed to send email to ${to}:`, err.message);
-    return false;
-  }
-};
-
-// 1. Send OTP Code
 router.post("/auth/send-otp", async (req, res) => {
   const { email } = req.body;
   if (!email || !email.trim()) {
@@ -99,11 +22,10 @@ router.post("/auth/send-otp", async (req, res) => {
   }
 
   const normalizedEmail = email.trim().toLowerCase();
-  // Generate 6-digit code
+
   const code = Math.floor(100000 + Math.random() * 900000).toString();
 
   try {
-    // Save to database, replacing previous code for this email if it existed
     await Otp.deleteMany({ email: normalizedEmail });
     await Otp.create({ email: normalizedEmail, code });
     console.log(`🔑 [OTP Generate] Code is: ${code} for email: ${normalizedEmail}`);
@@ -118,7 +40,7 @@ router.post("/auth/send-otp", async (req, res) => {
   }
 });
 
-// 2. Verify OTP Code & Login/Register
+
 router.post("/auth/verify-otp", async (req, res) => {
   const { email, code } = req.body;
   if (!email || !code) {
@@ -167,7 +89,7 @@ router.post("/auth/verify-otp", async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
     // Send welcome email if new account was created
@@ -187,7 +109,13 @@ router.post("/admin/auth", async (req, res) => {
   const { username, password } = req.body;
 
   if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-    res.cookie(ADMIN_COOKIE_NAME, ADMIN_COOKIE_VALUE, {
+    const token = jwt.sign(
+      { role: "Administrator" },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.cookie(ADMIN_COOKIE_NAME, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -211,16 +139,21 @@ router.delete("/admin/auth", async (req, res) => {
 });
 
 // Admin Auth - Verify Session (GET)
-router.get("/admin/auth", async (req, res) => {
-  const token = req.cookies[ADMIN_COOKIE_NAME];
-  if (token === ADMIN_COOKIE_VALUE) {
-    return res.json({ authenticated: true });
-  }
-  return res.status(401).json({ authenticated: false });
+router.get("/admin/auth", adminAuth, async (req, res) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  res.setHeader("Surrogate-Control", "no-store");
+  return res.json({ authenticated: true });
 });
 
 // 4. Customer Session (GET)
 router.get("/auth/session", async (req, res) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  res.setHeader("Surrogate-Control", "no-store");
+
   const token = req.cookies[USER_COOKIE_NAME];
   if (!token) {
     return res.json({ authenticated: false });
@@ -284,6 +217,11 @@ router.put("/auth/profile", async (req, res) => {
 
 // 7. Get Customer Orders (GET)
 router.get("/auth/orders", async (req, res) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  res.setHeader("Surrogate-Control", "no-store");
+
   const token = req.cookies[USER_COOKIE_NAME];
   if (!token) {
     return res.status(401).json({ error: "Unauthorized" });
@@ -312,6 +250,11 @@ router.get("/auth/orders", async (req, res) => {
 
 // GET all addresses for current user
 router.get("/auth/addresses", async (req, res) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  res.setHeader("Surrogate-Control", "no-store");
+
   const token = req.cookies[USER_COOKIE_NAME];
   if (!token) return res.status(401).json({ error: "Unauthorized" });
   try {

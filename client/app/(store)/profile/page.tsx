@@ -106,7 +106,7 @@ export default function ProfilePage() {
   useEffect(() => {
     async function getSession() {
       try {
-        const res = await fetch("/api/auth/session");
+        const res = await fetch("/api/auth/session", { cache: "no-store" });
         if (res.ok) {
           const data = await res.json();
           if (data.authenticated) {
@@ -139,7 +139,7 @@ export default function ProfilePage() {
   const fetchAddresses = async () => {
     setAddrLoading(true);
     try {
-      const res = await fetch("/api/auth/addresses");
+      const res = await fetch("/api/auth/addresses", { cache: "no-store" });
       if (res.ok) setAddresses(await res.json());
     } catch {}
     finally { setAddrLoading(false); }
@@ -150,7 +150,7 @@ export default function ProfilePage() {
       async function getOrders() {
         setOrdersLoading(true);
         try {
-          const res = await fetch("/api/auth/orders");
+          const res = await fetch("/api/auth/orders", { cache: "no-store" });
           if (res.ok) setOrders((await res.json()).sort((a: any, b: any) => b.id - a.id));
         } catch {}
         finally { setOrdersLoading(false); }
@@ -306,12 +306,12 @@ export default function ProfilePage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-[10px] font-bold text-[#1e2521] tracking-wider uppercase block mb-1.5">Full Name</label>
-                      <input type="text" required value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Chinmay Kumar"
+                      <input type="text" required value={name} onChange={e => setName(e.target.value)} placeholder="e.g. ABc"
                         className="w-full rounded-xl border border-[#e0e7e2] px-4 py-2.5 text-xs focus:outline-none focus:border-[#2d6a4f] bg-stone-50/50" />
                     </div>
                     <div>
                       <label className="text-[10px] font-bold text-[#1e2521] tracking-wider uppercase block mb-1.5">Phone Number</label>
-                      <input type="text" value={phoneVal} onChange={e => setPhoneVal(e.target.value)} placeholder="e.g. +91 98765 43210"
+                      <input type="text" value={phoneVal} onChange={e => setPhoneVal(e.target.value)} placeholder="e.g. +91 1234567890"
                         className="w-full rounded-xl border border-[#e0e7e2] px-4 py-2.5 text-xs focus:outline-none focus:border-[#2d6a4f] bg-stone-50/50" />
                     </div>
                   </div>
@@ -550,6 +550,28 @@ export default function ProfilePage() {
                                     {isExpanded ? "Show Less" : `Show All ${order.items.length} Items`}
                                   </button>
                                 )}
+
+                                {/* Price Breakdown */}
+                                <div className="pt-4 mt-3 border-t border-stone-100 space-y-2 text-xs">
+                                  <div className="flex justify-between text-stone-500">
+                                    <span>Subtotal:</span>
+                                    <span className="font-semibold text-stone-700">₹{(order.subtotal || 0).toFixed(2)}</span>
+                                  </div>
+                                  <div className="flex justify-between text-stone-500">
+                                    <span>Shipping:</span>
+                                    <span className="font-semibold text-stone-700">
+                                      {order.shipping === 0 ? "FREE" : `₹${(order.shipping || 0).toFixed(2)}`}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between text-stone-500">
+                                    <span>Estimated Tax (8%):</span>
+                                    <span className="font-semibold text-stone-700">₹{(order.tax || 0).toFixed(2)}</span>
+                                  </div>
+                                  <div className="flex justify-between text-stone-800 font-bold pt-2 border-t border-stone-100">
+                                    <span>Total:</span>
+                                    <span className="text-[#2d6a4f]">₹{(order.total || 0).toFixed(2)}</span>
+                                  </div>
+                                </div>
                               </>
                             );
                           })()}

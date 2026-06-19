@@ -92,7 +92,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   // ── Check if user is logged in ──────────────────────────────────────────────
   const checkSession = useCallback(async (): Promise<boolean> => {
     try {
-      const res = await fetch("/api/auth/session");
+      const res = await fetch("/api/auth/session", { cache: "no-store" });
       if (!res.ok) return false;
       const data = await res.json();
       return !!data.authenticated;

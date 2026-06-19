@@ -1,200 +1,3 @@
-// "use client";
-
-// import { Facebook, Instagram, Mail, MapPin, Phone, Twitter } from "lucide-react";
-// import Link from "next/link";
-// import { useState } from "react";
-
-// export default function Footer() {
-//   const [emailVal, setEmailVal] = useState("");
-
-//   const handleSubscribeSubmit = (e: React.FormEvent) => {
-//     e.preventDefault();
-//     if (emailVal) {
-//       console.log("Newsletter subscription:", emailVal);
-//       setEmailVal("");
-//     }
-//   };
-
-//   const footerSections = [
-//     {
-//       title: "COLLECTIONS",
-//       links: [
-//         { href: "/shop?category=Body Care", label: "Body Care" },
-//         { href: "/shop?category=Foot Care", label: "Foot Care" },
-//         { href: "/shop?category=Skin Care", label: "Skin Care" },
-//         { href: "/shop", label: "All Products" },
-//         { href: "/", label: "Gift Assortments" }
-//       ]
-//     },
-//     {
-//       title: "THE CRAFT",
-//       links: [
-//         { href: "/about", label: "Cold-Process Method" },
-//         { href: "/about", label: "Ingredient Purity" },
-//         { href: "/about", label: "Curing & Vaulting" },
-//         { href: "/about", label: "Sustainability Pledge" },
-//         { href: "/", label: "Cruelty-Free Commitment" }
-//       ]
-//     },
-//     {
-//       title: "CUSTOMER CARE",
-//       links: [
-//         { href: "/contact", label: "Contact Us" },
-//         { href: "/", label: "Shipping & Returns" },
-//         { href: "/", label: "FAQs" },
-//         { href: "/", label: "Store Locator" },
-//         { href: "/", label: "Skin Consultations" }
-//       ]
-//     },
-//     {
-//       title: "COMPANY",
-//       links: [
-//         { href: "/about", label: "Our Story" },
-//         { href: "/contact", label: "Visit Workshop" },
-//         { href: "/", label: "Careers" },
-//         { href: "/blog", label: "Herbal Journal" },
-//         { href: "/", label: "Wholesale Portal" }
-//       ]
-//     }
-//   ];
-
-//   const socialLinks = [
-//     { href: "#", icon: Facebook, label: "Facebook" },
-//     { href: "#", icon: Instagram, label: "Instagram" },
-//     { href: "#", icon: Twitter, label: "Twitter" }
-//   ];
-
-//   return (
-//     <footer className="bg-[#ece7dc] text-[#121312] border-t border-stone-300/60 pt-16 pb-10 px-6 sm:px-12 lg:px-24">
-//       <div className="max-w-7xl mx-auto space-y-12">
-        
-//         {/* Top Section: Newsletter subscription */}
-//         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-12 border-b border-stone-400/30 gap-6">
-//           <div className="space-y-2 max-w-md">
-//             <span className="text-[10px] font-bold tracking-widest text-[#626462] uppercase block">
-//               JOIN OUR CIRCLE
-//             </span>
-//             <h3 className="text-xl sm:text-2xl font-serif font-semibold text-[#121312] leading-tight">
-//               Sign up for seasonal releases and herbal insights
-//             </h3>
-//           </div>
-//           <div className="w-full lg:w-auto max-w-sm">
-//             <form 
-//               onSubmit={handleSubscribeSubmit} 
-//               className="flex items-center border-b border-stone-850 pb-1.5 focus-within:border-black transition-colors"
-//             >
-//               <input
-//                 type="text"
-//                 placeholder="Email or Phone"
-//                 value={emailVal}
-//                 onChange={(e) => setEmailVal(e.target.value)}
-//                 className="w-full bg-transparent text-xs sm:text-sm text-[#121312] placeholder-stone-500 focus:outline-none pr-4"
-//                 required
-//               />
-//               <button 
-//                 type="submit" 
-//                 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#121312] hover:opacity-75 transition-opacity shrink-0"
-//               >
-//                 Subscribe
-//               </button>
-//             </form>
-//           </div>
-//         </div>
-
-//         {/* Middle Section: Columns of links & Contacts */}
-//         <div className="grid grid-cols-1 lg:grid-cols-6 gap-8 lg:gap-10">
-          
-//           {/* Brand Info Column */}
-//           <div className="lg:col-span-2 space-y-6">
-//             <Link
-//               className="text-2xl font-serif tracking-[0.2em] text-[#121312] block hover:opacity-85"
-//               href="/"
-//             >
-//               ARAQ
-//             </Link>
-//             <p className="text-[#626462] text-xs sm:text-sm leading-relaxed max-w-xs">
-//               Crafting pure herbal elixirs, natural body bars, and skin remedies. Made in small batches using raw ingredients, organic oils, and traditional cold curing.
-//             </p>
-//             <div className="space-y-3 pt-2 text-[#121312]/80 text-xs sm:text-sm">
-//               <div className="flex items-start gap-3">
-//                 <MapPin className="h-4 w-4 text-[#121312] shrink-0 mt-0.5" />
-//                 <span>456 Botanical Valley, Meadow Creek, OR 97401</span>
-//               </div>
-//               <div className="flex items-center gap-3">
-//                 <Phone className="h-4 w-4 text-[#121312] shrink-0" />
-//                 <span>+1 (555) 762-7724</span>
-//               </div>
-//               <div className="flex items-center gap-3">
-//                 <Mail className="h-4 w-4 text-[#121312] shrink-0" />
-//                 <span>hello@araqherbal.com</span>
-//               </div>
-//             </div>
-//           </div>
-
-//           {/* Nav Links columns — 2 col on mobile, 4 col on desktop within the lg:col-span-4 */}
-//           <div className="lg:col-span-4 grid grid-cols-2 sm:grid-cols-4 gap-6 lg:gap-8">
-//             {footerSections.map((section, idx) => (
-//               <div key={idx} className="space-y-4">
-//                 <h4 className="text-[10px] font-bold text-[#121312] uppercase tracking-widest">
-//                   {section.title}
-//                 </h4>
-//                 <ul className="space-y-2.5">
-//                   {section.links.map((link, linkIdx) => (
-//                     <li key={linkIdx}>
-//                       <Link
-//                         href={link.href}
-//                         className="text-xs text-[#626462] hover:text-[#121312] transition-colors inline-block leading-relaxed"
-//                       >
-//                         {link.label}
-//                       </Link>
-//                     </li>
-//                   ))}
-//                 </ul>
-//               </div>
-//             ))}
-//           </div>
-
-//         </div>
-
-//         {/* Bottom Section: Dividers and Copyright details */}
-//         <div className="pt-8 border-t border-stone-400/30 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
-//           {/* Brand Copyright */}
-//           <div className="flex flex-col sm:flex-row items-center sm:items-baseline gap-2 sm:gap-4 text-center sm:text-left text-[#121312]/80">
-//             <span>© Araq 2026</span>
-//             <span className="hidden sm:inline text-stone-400">|</span>
-//             <span>
-//               Website by{" "}
-//               <a 
-//                 href="https://github.com/bloomtpl" 
-//                 target="_blank" 
-//                 rel="noopener noreferrer" 
-//                 className="font-bold underline hover:text-[#121312] transition-colors"
-//               >
-//                 TechVanta Labs Pvt Ltd
-//               </a>
-//             </span>
-//           </div>
-
-//           {/* Social icons */}
-//           <div className="flex gap-4">
-//             {socialLinks.map(({ href, icon: Icon, label }) => (
-//               <a
-//                 key={label}
-//                 href={href}
-//                 className="text-[#626462] hover:text-[#121312] transition-colors"
-//                 aria-label={label}
-//               >
-//                 <Icon className="h-4 w-4" />
-//               </a>
-//             ))}
-//           </div>
-//         </div>
-
-//       </div>
-//     </footer>
-//   );
-// }
-
 "use client";
 
 import {
@@ -280,10 +83,10 @@ export default function Footer() {
       title: "COMPANY",
       links: [
         { href: "/about", label: "Our Story" },
-        { href: "/contact", label: "Visit Workshop" },
-        { href: "/", label: "Careers" },
-        { href: "/blog", label: "Herbal Journal" },
-        { href: "/", label: "Wholesale Portal" },
+        // { href: "/contact", label: "Visit Workshop" },
+        // { href: "/", label: "Careers" },
+        // { href: "/blog", label: "Herbal Journal" },
+        // { href: "/", label: "Wholesale Portal" },
       ],
     },
   ];
@@ -376,20 +179,20 @@ export default function Footer() {
               <div className="flex items-start gap-3">
                 <MapPin className="h-4 w-4 text-[#2F5D50] mt-1 shrink-0" />
                 <span>
-                  456 Botanical Valley,
+                  
                   <br />
-                  Meadow Creek, OR 97401
+                 
                 </span>
               </div>
 
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-[#2F5D50]" />
-                <span>+1 (555) 762-7724</span>
+                <span></span>
               </div>
 
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-[#2F5D50]" />
-                <span>hello@araqherbal.com</span>
+                <span></span>
               </div>
             </div>
           </div>
@@ -434,7 +237,7 @@ export default function Footer() {
             <span className="hidden sm:inline mx-3 text-[#C5C0B5]">•</span>
             Crafted with care by
             <a
-              href="https://github.com/bloomtpl"
+              href="https://steady-parfait-58ebee.netlify.app"
               target="_blank"
               rel="noopener noreferrer"
               className="ml-1 font-semibold text-[#2F5D50] hover:text-[#1F453B]"

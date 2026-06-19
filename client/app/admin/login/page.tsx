@@ -130,29 +130,6 @@ function AdminLoginForm() {
               )}
             </button>
           </form>
-
-          {/* Demo credentials hint */}
-          <div className="mt-6 pt-5 border-t border-[#e0e7e2]">
-            <div className="bg-[#f1f5f2] border border-[#e0e7e2]/70 rounded-2xl p-4 text-center">
-              <p className="text-[10px] font-bold text-[#2d6a4f] tracking-widest uppercase mb-2">
-                Demo Credentials
-              </p>
-              <div className="flex justify-center gap-6 text-xs text-[#5c6b62]">
-                <span>
-                  User:{" "}
-                  <code className="font-mono bg-white px-1.5 py-0.5 rounded border border-[#e0e7e2] font-semibold text-[#1e2521]">
-                    admin
-                  </code>
-                </span>
-                <span>
-                  Pass:{" "}
-                  <code className="font-mono bg-white px-1.5 py-0.5 rounded border border-[#e0e7e2] font-semibold text-[#1e2521]">
-                    admin123
-                  </code>
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

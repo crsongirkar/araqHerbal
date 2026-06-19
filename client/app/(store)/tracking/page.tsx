@@ -21,7 +21,7 @@ interface TrackedOrder {
   id: number;
   customerName: string;
   date: string;
-  status: string; // Pending, Shipped, Delivered, Cancelled
+  status: string; 
   items: OrderItem[];
   total: number;
 }
