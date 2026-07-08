@@ -12,6 +12,9 @@ import {
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3659628440809383"
+     crossorigin="anonymous"></script>
+
 export default function Footer() {
   const [emailVal, setEmailVal] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
