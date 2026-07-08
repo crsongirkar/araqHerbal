@@ -10,14 +10,14 @@ import {
   Check,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 
 export default function Footer() {
   const [emailVal, setEmailVal] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
-  const handleSubscribeSubmit = async (e: React.FormEvent) => {
+  const handleSubscribeSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!emailVal.trim()) return;
 
@@ -149,7 +149,7 @@ export default function Footer() {
                   </button>
                 </form>
                 {status === "error" && (
-                  <p className="mt-2 text-xs text-red-650 px-4 font-medium">
+                  <p className="mt-2 text-xs text-red-600 px-4 font-medium">
                     {message}
                   </p>
                 )}
@@ -179,20 +179,20 @@ export default function Footer() {
               <div className="flex items-start gap-3">
                 <MapPin className="h-4 w-4 text-[#2F5D50] mt-1 shrink-0" />
                 <span>
-                  
+                  123 Herbal Lane
                   <br />
-                 
+                  Pune, Maharashtra, India
                 </span>
               </div>
 
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-[#2F5D50]" />
-                <span></span>
+                <span>+91 00000 00000</span>
               </div>
 
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-[#2F5D50]" />
-                <span></span>
+                <span>hello@araq.com</span>
               </div>
             </div>
           </div>
